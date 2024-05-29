@@ -1,0 +1,15 @@
+FATTO   ||aggiungere un controllo su data e ora in modo che non possano rimanere vuoti
+FATTO   ||AGGIUNGERE IL calendario sulla data e i controlli su esso
+FATTO    ||permettere il sorting della lista di prenotati in base all'orario o ai coperti
+TODO    ||Usare un file json come database anzi che una variabile di vue
+
+FATTO    ||aggiundere un convertitore che nella vista settimanale faccia vedere i giorni
+        in parole "lunedi" "martedi" ecc
+
+TODO    ||aggiungere animazione quando un tavolo arriva o viene eliminato o non si presenta
+
+FATTO    ||aggiungere funzione del popUp in cui se clicchi fuori dal form ti annulla l'inserimento della nuova prenotazione 
+
+FATTO   ||upgradare popolate_reservationData_SelectedDay() in booking list in modo che venga triggerata con una listen come descritto in mounted()
+
+FATTO     ||sortando o menttendo una nuova entry o agendo su delle entry la lista non sia ggiorna in automatico fino a che non cambi il giorno o fai on-off allo show all
