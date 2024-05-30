@@ -79,11 +79,19 @@ export default {
       console.log("new reservation made: ", 
         this.newReservationData.nome, this.newReservationData.giorno, 
         this.newReservationData.ora, this.newReservationData.coperti) */
-      let tempData = {nome: nome, giorno: giorno, ora: ora, coperti: coperti, uuid: uuid}
-      this.reservationData.push(tempData)
-      console.log(this.reservationData)
 
-      this.currentEntryToEdit = { nome: '', giorno: '', ora: '', coperti: "", uuid: '' }
+      //It is mandatory to have at least the day and hour (if not, discard the new entry).
+      if(giorno && ora){
+        let tempData = {nome: nome, giorno: giorno, ora: ora, coperti: coperti, uuid: uuid}
+        this.reservationData.push(tempData)
+        console.log(this.reservationData)
+        this.currentEntryToEdit = { nome: '', giorno: '', ora: '', coperti: "", uuid: '' }
+      }
+      else{
+        //just escaped form
+
+      }
+      
     },
     
 
