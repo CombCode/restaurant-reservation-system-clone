@@ -1,9 +1,7 @@
 <template>
   <div class="backgrownd bg-gray-500 w-screen h-screen fixed top-0 overflow-auto" >
-<<<<<<< HEAD
-=======
+    
     <div class="bg-white w-4/6 m-auto mt-6" :class="{blurr: showModal}">
->>>>>>> parent of 923eaef (fixed a visualization issue on smartphones)
 
       <!-- header -->
       <div class="bg-red-700 h-20 w-10 rounded-br-2xl my-0 -mb-20 "></div>

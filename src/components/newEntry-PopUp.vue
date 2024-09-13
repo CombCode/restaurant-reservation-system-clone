@@ -1,14 +1,27 @@
 <template>
-  <div class="backgrownd bg-red-200 bg-opacity-50 w-screen h-screen fixed top-0 bg-cover" @click.self="escForm">
-    <div class="modal bg-red-50 my-20 mx-40 flex flex-col justify-around items-center rounded-xl shadow-2xl shadow-black max-[600px]:mx-0 " @keyup.enter="sendData">
 
-      <h1 class=" my-5 text-3xl font-bold text-red-600 ">Dati prenotazione</h1>
+  <!-- blurred container -->
+  <div 
+  class="backgrownd bg-red-200 bg-opacity-50 w-screen h-screen fixed top-0 bg-cover"
+  @click.self="escForm">
 
+    <!-- modal window -->
+    <div 
+    class="modal bg-red-50 my-20 mx-40 flex flex-col justify-around items-center rounded-xl shadow-2xl shadow-black 
+    max-[600px]:mx-0"
+    @keyup.enter="sendData">
+      
+      <!-- title -->
+      <h1 
+      class="my-5 text-3xl font-bold text-red-600"
+      >Dati prenotazione</h1>
+
+      <!-- name input -->
       <label for="nome">nome</label>
       <input type="text" id="nome" v-model="nome" class="formInput">
 
-      <label for="giorno">giorno</label>  
-      <!-- <input type="text" id="giorno" v-model="giorno"> -->
+      <!-- day input -->
+      <label for="giorno">giorno</label>
       <VueDatePicker class="formInput" v-model="date" @update:model-value="parsingDateformat" locale="it" auto-apply :enable-time-picker="false" :format="format" input-class-name="dp-custom">
         <template #input-icon="{ clear }">
         </template>
@@ -16,8 +29,8 @@
         </template>
       </VueDatePicker>
 
+      <!-- hour input -->
       <label for="ora">ora</label>
-      <!-- <input type="text" id="ora" v-model="ora">  -->
       <VueDatePicker v-model="time" time-picker @update:model-value="parsingHourformat" locale="it" :start-time="startTime" minutes-increment="15" minutes-grid-increment="15" :min-time="{ hours: 12, minutes: 0 }" :max-time="{ hours: 22, minutes: 0 }" input-class-name="dp-custom" class="formInput">
         <template #input-icon="{ clear }">
         </template>
@@ -25,14 +38,16 @@
         </template>
       </VueDatePicker>
 
+      <!-- seats input -->
       <label for="coperti">coperti</label>
       <input type="text" id="coperti" v-model="coperti" class="formInput">
 
-      <!-- feedback input -->
-      <p class="text-red-600 my-3 text-xs px-2 rounded-xl" v-if="feedbackInputGiorno" :class="{ glow : highLight }">{{feedbackInputGiorno}}</p>
+      <!-- feedback output -->
+      <p class="text-red-600 my-3 text-xs px-2 rounded-xl" v-if="feedbackInputgiorno" :class="{ glow : highLight }">{{feedbackInputgiorno}}</p>
       <p class="text-red-600 my-3 text-xs px-2 rounded-xl" v-if="feedbackInputOra" :class="{ glow : highLight }">{{feedbackInputOra}}</p>
       <p class="text-red-600 my-3 text-xs px-2 rounded-xl" v-if="feedbackInputCoperti" :class="{ glow : highLight }">{{feedbackInputCoperti}}</p>
 
+      <!-- send data -->
       <button class=" bg-red-300 hover:bg-red-700 hover:text-white text-black rounded my-5 max-w-fit p-2" @click="sendDataset"> Aggiungi</button>
 
     </div>
@@ -42,74 +57,62 @@
 <script>
 import VueDatePicker from '@vuepic/vue-datepicker';
 import '@vuepic/vue-datepicker/dist/main.css';
+import { ref } from 'vue';
 
 export default {
   
-  props:[
-    "currentEntryToEdit"
-  ],
-  
-  data () {
-    return {
-        nome: "",
-        giorno: "",
-        ora: "",
-        coperti: "",
-        uuid: "",
+  props:["currentEntryToEdit"],
+  setup(){
+    let nome = ref("")
+    let giorno = ref("")
+    let ora = ref("")
+    let coperti = ref("")
+    let uuid = ref("")
 
-        feedbackInputGiorno: "",
-        feedbackInputOra: "",
-        feedbackInputCoperti: "",
+    let feedbackInputgiorno = ref("")
+    let feedbackInputOra = ref("")
+    let feedbackInputCoperti = ref("")
 
-        highLight: false,
-        date: "",
-        time: "",
+    let highLight = ref(false)
+    let date = ref("")
+    let time = ref("")
 
-        format: "",
-        startTime: { hours: 12, minutes: 0 },
-    }
-  },
-  mounted() {
+    let format = ""
+    let startTime = { hours: 12, minutes: 0 }
 
-    //check prop
+    /* //check prop
     console.log("MOUNTED", JSON.parse(JSON.stringify(this.currentEntryToEdit)).currentEntryToEdit)
       if (this.currentEntryToEdit !== ""){
         let parsedEntry = JSON.parse(JSON.stringify(this.currentEntryToEdit)).currentEntryToEdit
-        this.nome = parsedEntry.nome
-        this.giorno = parsedEntry.giorno
-        this.ora = parsedEntry.ora
-        this.coperti = parsedEntry.coperti
-        this.uuid = parsedEntry.uuid
+        this.nome.value = parsedEntry.nome
+        this.giorno.value = parsedEntry.giorno
+        this.ora.value = parsedEntry.ora
+        this.coperti.value = parsedEntry.coperti
+        this.uuid.value = parsedEntry.uuid
       }
-      else{}
-    },
+      else{} */
 
-    //init calendar
-    
-
-  methods: {
-    generaUUID(){
-      if(this.uuid == ""){
+    function generaUUID(){
+      if(this.uuid.value == ""){
         const uuid = crypto.randomUUID();
         console.log(uuid);
         //check in the data for the same uuid, if so, pick another
 
-        this.uuid = uuid
+        this.uuid.value = uuid
       }
       else{}
-    },
+    }
 
-    escForm(){
-      this.nome = ""
-      this.ora = ""
-      this.giorno = ""
-      this.uuid = ""
-      this.coperti = ""
+    function escForm(){
+      this.nome.value = ""
+      this.ora.value = ""
+      this.giorno.value = ""
+      this.uuid.value = ""
+      this.coperti.value = ""
       this.$emit("close")
-    },
+    }
 
-
-    sendDataset(){
+    function sendDataset(){
       this.highLight_Activation()
 
       this.feedbackInputData = ""
@@ -118,35 +121,32 @@ export default {
       //assegno una variabile al risultato dei controlli sennò si crea un bug nella
       //visualizzazione degli alert di errore in quanto nell'if i controlli vengono throwati non uniformemente
       const dataOk = this.checkOra()
-      const giornoOk = this.checkGiorno()
+      const giornoOk = this.checkgiorno()
       const copertiOk = this.checkCoperti()
 
-
-
-      if(dataOk && giornoOk && copertiOk){
-        console.log(this.nome, this.giorno, this.ora, this.coperti)
+      if(dataOk && giorno.valueOk && copertiOk){
+        console.log(this.nome.value, this.giorno.value, this.ora.value, this.coperti.value)
 
         //unique ID
         this.generaUUID()
 
         //nome fittizio in caso di campo vuoto
-        if(this.nome == ""){
-          this.nome = "<Nessun Nome>"
+        if(this.nome.value == ""){
+          this.nome.value = "<Nessun Nome>"
         }
 
-        this.$emit("close", this.nome, this.giorno, this.ora, this.coperti, this.uuid)
+        this.$emit("close", this.nome.value, this.giorno.value, this.ora.value, this.coperti.value, this.uuid.value)
 
-        this.nome = ""
-        this.giorno = ""
-        this.ora = ""
-        this.coperti = ""
-        this.uuid = ""
+        this.nome.value = ""
+        this.giorno.value = ""
+        this.ora.value = ""
+        this.coperti.value = ""
+        this.uuid.value = ""
         }
       else{}  
-    },
+    }
 
-
-    checkOra(){
+    function checkOra(){
       /* if(isNaN(this.ora) || parseInt(this.ora) < 1 || parseInt(this.ora) > 24){
         this.feedbackInputData = "inserisci un orario valido (numero da 1 a 24)"
         return false
@@ -154,7 +154,7 @@ export default {
       else{
         return true
       } */
-      if(this.ora == "" || this.ora == null || this.ora == " "){
+      if(this.ora.value == "" || this.ora.value == null || this.ora.value == " "){
         this.feedbackInputOra = "inserisci un orario valido"
         return false
       }
@@ -162,19 +162,21 @@ export default {
         this.feedbackInputOra = ""
         return true
       }
-    },
-    checkGiorno(){
-      if(this.giorno == "" || this.giorno == null || this.giorno == " "){
-        this.feedbackInputGiorno = "inserisci un giorno valido"
+    }
+
+    function checkgiorno(){
+      if(this.giorno.value == "" || this.giorno.value == null || this.giorno.value == " "){
+        this.feedbackInputgiorno.value = "inserisci un giorno valido"
         return false
       }
       else{
-        this.feedbackInputGiorno = ""
+        this.feedbackInputgiorno = ""
         return true
       }
-    },
-    checkCoperti(){
-      if(isNaN(this.coperti) || parseInt(this.coperti) < 0 || parseInt(this.coperti) > 99){
+    }
+
+    function checkCoperti(){
+      if(isNaN(this.coperti.value) || parseInt(this.coperti.value) < 0 || parseInt(this.coperti.value) > 99){
         this.feedbackInputCoperti = "inserisci un numero di coperti da 0 a 99"
         return false
       }
@@ -182,10 +184,9 @@ export default {
         this.feedbackInputCoperti = ""
         return true
       }
-    },
+    }
 
-
-    parsingDateformat(){
+    function parsingDateformat(){
       console.log("la data grezza è: ", this.date)
       //parsing di Date Sat Apr 06 2024 01:14:00 GMT+0200 (Ora legale dell’Europa centrale)
         //non necessario. calendario fornisce this.format come output della data (senza l'ora)
@@ -194,28 +195,37 @@ export default {
         const month = date.getMonth() + 1;
         const year = date.getFullYear();
 
-        this.giorno = day + " " + month + " " + year;
+        this.giorno.value = day + " " + month + " " + year;
 
 
         return `${day}/${month}/${year}`;
       }
-    },
-    parsingHourformat(){
+    }
+
+    function parsingHourformat(){
       console.log("l' ora grezza è: ", this.time)
       //parsing di this.time
 
       const timeObj = JSON.parse(JSON.stringify(this.time))
       console.log("l' ora parsata è: ",timeObj)
 
-      this.ora = timeObj.hours + ":" + timeObj.minutes
+      this.ora.value = timeObj.hours + ":" + timeObj.minutes
 
-    },
+    }
 
-    highLight_Activation(){
+    function highLight_Activation(){
       this.highLight = true
       setTimeout(() => {this.highLight = false}, 2000)
     }
+    
+    return{
+      nome, giorno, ora, coperti, uuid,
+      generaUUID, escForm, sendDataset,
+      checkOra, checkgiorno, checkCoperti,
+      parsingDateformat, parsingHourformat, highLight_Activation
+    }
   }
+
   
 }
 </script>
