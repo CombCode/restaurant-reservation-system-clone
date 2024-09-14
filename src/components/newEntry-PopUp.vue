@@ -14,7 +14,7 @@
       <!-- title -->
       <h1 
       class="my-5 text-3xl font-bold text-red-600"
-      >New reservation</h1>
+      >New Reservation</h1>
 
       <!-- name input -->
       <label for="nome">name</label>
@@ -23,19 +23,15 @@
       <!-- day input -->
       <label for="giorno">date</label>
       <VueDatePicker class="formInput" v-model="newDate" locale="it" auto-apply :enable-time-picker="false" input-class-name="dp-custom">
-        <template #input-icon="{ clear }">
-        </template>
-        <template #clear-icon="{ clear }">
-        </template>
+        <template #input-icon="{ clear }"></template>
+        <template #clear-icon="{ clear }"></template>
       </VueDatePicker>
 
       <!-- hour input -->
       <label for="ora">hour</label>
       <VueDatePicker v-model="newHour" time-picker locale="it" minutes-increment="15" minutes-grid-increment="15" :min-time="{ hours: 12, minutes: 0 }" :max-time="{ hours: 22, minutes: 0 }" input-class-name="dp-custom" class="formInput">
-        <template #input-icon="{ clear }">
-        </template>
-        <template #clear-icon="{ clear }">
-        </template>
+        <template #input-icon="{ clear }"></template>
+        <template #clear-icon="{ clear }"></template>
       </VueDatePicker>
 
       <!-- seats input -->
@@ -43,10 +39,11 @@
       <input type="text" id="coperti" v-model="newSeats" class="formInput">
 
       <!-- feedback output -->
-      <!-- <p class="text-red-600 my-3 text-xs px-2 rounded-xl" v-if="feedbackInputgiorno" :class="{ glow : highLight }">{{feedbackInputgiorno}}</p>
-      <p class="text-red-600 my-3 text-xs px-2 rounded-xl" v-if="feedbackInputOra" :class="{ glow : highLight }">{{feedbackInputOra}}</p>
-      <p class="text-red-600 my-3 text-xs px-2 rounded-xl" v-if="feedbackInputCoperti" :class="{ glow : highLight }">{{feedbackInputCoperti}}</p>
- -->
+      <p class="text-red-600 my-3 text-xs px-2 rounded-xl"
+      :class="{ glow : errorGlow }"
+      v-if="alertToggle"
+      >{{error}}</p>
+     
       <!-- send data button-->
       <button 
       class=" bg-red-300 hover:bg-red-700 hover:text-white text-black rounded my-5 max-w-fit p-2"
@@ -68,7 +65,7 @@ export default {
 
   setup(props, { emit }){
     
-
+    
     let newName = ref()
     let newDate = ref()
     let newHour = ref()
@@ -84,26 +81,32 @@ export default {
         escForm()
       }
       catch(errorObj){
-        console.log(errorObj.message)
-        //this.highLight_Activation()
+        manageError(errorObj.message)
       }
     }
 
-   /*  let highLight = ref(false)
-    function highLight_Activation(){
-      this.highLight = true
-      setTimeout(() => {this.highLight = false}, 2000)
-    } */
+    //error alerts logic
+    let alertToggle = ref(false)
+    let error = ref()
+    let errorGlow = ref(false)
+    function manageError(errorLog){
+      //show error alert
+      alertToggle.value = true
+      error.value = errorLog
+      //glow alert for 2 seconds
+      errorGlow.value = true
+      setTimeout(() => {errorGlow.value = false}, 2000)
+    }
 
+    //close form
     function escForm(){
-          //when esc the form the reservation obj is garbaged //TODO check this info
       emit("close")
     }
 
     return{
       newName, newDate, newHour, newSeats,
       escForm, saveReservation,
-      /* highLight_Activation */
+      alertToggle, error, errorGlow
     }
   }
 }
@@ -130,13 +133,13 @@ export default {
 
     height: 40px;
   }
+
   .glow {
     animation: glowing 2s infinite;
   }
-
   @keyframes glowing {
-    0% {background-color: white;}
-    50% {background-color: rgba(255, 0, 0, 0.5);}
-    100% {background-color: white;}
+    0% {filter: drop-shadow(0 0px 0px rgb(255 0 0 / 0));}
+    50% {filter: drop-shadow(0 1px 2px rgb(255 0 0 / 1));}
+    100% {filter: drop-shadow(0 0px 0px rgb(255 0 0 / 0));}
   }
 </style>
