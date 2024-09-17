@@ -3,7 +3,7 @@ import DB_Reservation from "../DB_reservation.json"
 export class Reservation{
     constructor(name, date, hour, seats){
         this.nome = this.setName(name) 
-        this.date = this.setDate(date) 
+        this.date = this.setDate(date)
         this.hour = this.setHour(hour) 
         this.seats = this.setSeats(seats) 
         this.uid = Symbol()
@@ -29,7 +29,10 @@ export class Reservation{
     }
     setHour(hour){
         if(stringExistAndNotEmpty(hour)){
-            this.hour = hour
+            let hh = hour.hour
+            let mm = hour.minutes
+            let ss = hour.seconds
+            this.hour = hh + ":" + mm + ":" + ss
         }
         else{
             throw new Error("hour not valid")   //TODO specificare poi perchè non valida
@@ -37,15 +40,15 @@ export class Reservation{
     }
     setSeats(seats){
         if(isNaN(seats) || parseInt(seats) < 0 || parseInt(seats) > 99){
-            throw new Error("seats number must be a number from 0 to 99") //TODO mby a better englich
+            throw new Error("seats number must be a number from 0 to 99") //TODO mby a better english lol
         }
         else{
-            this.seats = seats
+            this.seats = seats.toISOString()
         }
     }
 
     //getters
-    getNome(uid){
+    /* getNome(uid){
 
     }
     getDate(uid){
@@ -56,7 +59,7 @@ export class Reservation{
     }
     getSeats(uid){
 
-    }
+    } */
     
     //static metods
     static pushToDB(obj){
@@ -76,9 +79,6 @@ export class Reservation{
             }
         }
     }
-    static getAllReservations(){
-
-    }
     static getReservationsSortedBy(value){
         if(value == "hour"){
 
@@ -87,8 +87,26 @@ export class Reservation{
 
         }
         else{
-            
+
         }
+    }
+    static getSpecificDateReservations(dateObj){
+        //empty array to return
+        let specificDateReservations = []
+
+        //input obj converted into only date string
+        dateObj = dateObj.toISOString().split('T')[0]
+
+        //loop in the DB array to find reservation objects with our date
+        for(let reservation of DB_Reservation){
+             //DB iso string date converted into only date string
+            let reservationDate = reservation.date.split('T')[0]
+
+            if(reservationDate == dateObj){  
+                specificDateReservations.push(reservation)
+            }
+        }
+        return specificDateReservations
     }
 
 }
@@ -103,3 +121,6 @@ function stringExistAndNotEmpty(string) {   //hoisted right?
         return true
     }
 }
+/* function getAllReservations(){
+    return DB_Reservation
+} */

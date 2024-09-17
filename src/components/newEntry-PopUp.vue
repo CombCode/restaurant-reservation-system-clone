@@ -65,7 +65,6 @@ export default {
 
   setup(props, { emit }){
     
-    
     let newName = ref()
     let newDate = ref()
     let newHour = ref()
@@ -73,10 +72,6 @@ export default {
 
     function saveReservation(){
       try{
-        console.log("newName:", newName.value)
-        console.log("newDate:", newDate.value)
-        console.log("newHour:", toRaw(newHour.value))
-        console.log("newSeats:", newSeats.value)
         let reservation = new Reservation(newName.value, newDate.value, toRaw(newHour.value), newSeats.value)
         escForm()
       }

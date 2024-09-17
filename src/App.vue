@@ -17,21 +17,21 @@
 
       <!-- sorting tab -->
       <div class=" font-mono bold sortingTab flex justify-center flex-row max-[600px]:flex-col mb-6">
-       <!--  <div class="p-1 bg-white w-1/2" @click="sortX_orario"> //TODO redo
+       <!--  <div class="p-1 bg-white w-1/2" @click="sortX_orario"> //TODO redo sorting logic
           <p class="m-4 border rounded-2xl hover:bg-red-900 hover:text-white shadow shadow-black hover:shadow-2xl">sort by hour</p>
         </div>
-        <div class="p-1 bg-white w-1/2" @click="sortX_coperti"> //TODO redo
+        <div class="p-1 bg-white w-1/2" @click="sortX_coperti"> //TODO redo sorting logic
           <p class="m-4 border rounded-2xl hover:bg-red-900 hover:text-white shadow shadow-black hover:shadow-2xl">sort by seats</p>
         </div> -->
       </div>
 
       <!-- lista booking -->
-      <BookingList :reservationData="reservationData" @eseguiAzioneSuEntry="handleAzioneSuEntry" v-if="reloadList"></BookingList>
+      <BookingList :reservationData="reservationData" @eseguiAzioneSuEntry="handleAzioneSuEntry" v-if="showBookingList"></BookingList>
  
     </div>
     
     <!-- newEntryModal -->
-    <NewEntryModal v-if="showModal" @close="handleNewReservation" :currentEntryToEdit={currentEntryToEdit}></NewEntryModal>
+    <NewEntryModal v-if="showModal" @close="toggleModal" :currentEntryToEdit={currentEntryToEdit}></NewEntryModal>
   </div>
 </template>
 
@@ -48,25 +48,24 @@ export default {
   data(){
     return{
       showModal: false,
-      reloadList: true,  
+      showBookingList: true,  
     }
   },
   methods:{
     toggleModal(){
       this.showModal = !this.showModal;
-      this.forceReloadList()
+      if(this.showModal == false){
+        this.forceReloadList()   
+      }
+      
     },
-    handleNewReservation(){
-      this.toggleModal()
-    },
-    
     forceReloadList() {
         // Remove my-component from the DOM
-        this.reloadList = false;
+        this.showBookingList = false;
 
         this.$nextTick(() => {
           // Add the component back in
-          this.reloadList = true;
+          this.showBookingList = true;
         });
     },
 
@@ -82,16 +81,16 @@ export default {
           return parseInt(a.ora.match(/\d+/g)[0]) - parseInt(b.ora.match(/\d+/g)[0])
         }   
       })
-      this.forceReloadList()
+      this.forceShowBookingList()
     },
     sortX_coperti(){
       this.reservationData = this.reservationData.sort((a, b) => a.coperti - b.coperti)
-      this.forceReloadList()
+      this.forceShowBookingList()
     } */
   },
   /* mounted(){
     this.reservationData = compileExamples(10)  //TODO set a examples creator
-    this.forceReloadList()
+    this.forceShowBookingList()
   } */
 }
 
