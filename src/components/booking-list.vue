@@ -5,19 +5,20 @@
     <div>
         <!-- day chooser bar -->
         <div class="my-5 flex flex-row justify-center max-[600px]:flex-col items-center">  
-            <!-- seen with the day chooser -->
-            <div v-if="!showAll" class="flex flex-row flex-grow justify-center p-2 w-3/4 border-r-2 border-solid border-red-900">
+            <!-- day chooser with label -->
+            <div v-if="!showAll" class="flex flex-row justify-center py-2 w-3/4 border-r-2 border-solid border-red-900">
                 <p @click="prevDate()" class="font-mono font-bold text-2xl rounded px-2 cursor-pointer hover:bg-red-900 hover:text-white" ><</p>
                 <p class="text-xl font-mono font-bold w-40">{{selectedDateLabel}}</p>   
                 <p @click="nextDate()" class="font-mono font-bold text-2xl rounded px-2 cursor-pointer hover:bg-red-900 hover:text-white">></p>
             </div>
-            <div class="w-1/4 flex flex-col">
+            <!-- sorting buttons -->
+            <div class="w-1/4 ml-2 rounded-e-xl mr-4 m flex flex-col">
                 <button
-                class=" bg-red-100 hover:bg-red-900 hover:text-white text-black text-sm rounded-e-xl ml-2 mr-4 my-1"
+                class=" bg-red-100 hover:bg-red-900 hover:text-white text-black text-sm rounded-e-xl my-1"
                 @click="sortByTime"
                 >Sort by hour</button>
                 <button
-                class=" bg-red-100 hover:bg-red-900 hover:text-white text-black text-sm rounded-e-xl ml-2 mr-4 my-1"
+                class=" bg-red-100 hover:bg-red-900 hover:text-white text-black text-sm rounded-e-xl my-1"
                 @click="sortBySeats"
                 >Sort by seats</button>
             </div>
@@ -37,7 +38,7 @@
             class="grid grid-cols-4 py-2 h-auto
             hover:bg-gray-200 items-center 
             max-[600px]:grid-cols-1 max-[600px]:border max-[600px]:border-red-900">
-                <actionsOnEntry> <!-- @azioneRichiesta="handle_azioneRichiesta($event,reservation.uid)" --></actionsOnEntry>
+                <actionsOnEntry @actionOnReservation="(action) => handleActionOnReservation(action, reservation)"></actionsOnEntry>
                 <li>{{reservation.name}}</li>
                 <li>{{reservation.hour}}</li>
                 <li>{{reservation.seats}}</li>
@@ -101,7 +102,6 @@ export default {
         //reservation list handling
         function getSelectedDateReservations(){
             selectedDate_Reservations.value = Reservation.getSpecificDateReservations(selectedDate.value) //objects array
-            console.log("selectedDate_Reservations prePRE", selectedDate_Reservations.value)
         }
         
         //sorting logic
@@ -131,12 +131,36 @@ export default {
             toggleSortingSeatsDirection++
         }
 
+        //Actions on reservations handling
+        function handleActionOnReservation(action, reservation){
+            console.log("handleActionOnReservation triggered")
+            console.log("action: ", action)
+            console.log("reservation: ", reservation)
+
+            switch(action){
+                case "arrived" : {
+
+                }
+                case "noShow" : {
+
+                }
+                case "edit" : {
+
+                }
+                case "delete" : {
+                    Reservation.deleteFromDB(reservation)
+                    getSelectedDateReservations()
+                }
+            }
+        }
+
         //--------------------------------------------------------------
         return{
             showAll,
             selectedDateLabel,
             selectedDate, selectedDate_Reservations, prevDate, nextDate,
-            sortByTime, sortBySeats
+            sortByTime, sortBySeats,
+            handleActionOnReservation
         }
     },
 

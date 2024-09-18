@@ -1,4 +1,5 @@
 import { reservations as DB_Reservation } from "../DB_reservation.js";
+import { toRaw } from "vue";
 
 export class Reservation{
     constructor(name, date, hour, seats){
@@ -49,19 +50,15 @@ export class Reservation{
     static pushToDB(obj){
         DB_Reservation.push(obj)   //the db is an array of objects
     }
-    static getReservationFromDB(uid){   //TODO see if better to pass obj or uid
-        for(reservation of DB_Reservation){
-            if(reservation.uid == uid){
-                return DB_Reservation
+    static getReservationFromDB(reservationObj){   //TODO see if better to pass obj or uid
+        for(let reservation of DB_Reservation){
+            if(reservation == reservationObj){
+                return reservation
             }
         }
     }
-    static deleteFromDB(uid){
-        for(reservation of DB_Reservation){
-            if(reservation.uid == uid){
-                DB_Reservation.splice(DB_Reservation.indexOf(reservation), 1)
-            }
-        }
+    static deleteFromDB(reservationObj){
+        DB_Reservation.splice(DB_Reservation.indexOf(toRaw(reservationObj)), 1)
     }
     static getReservationsSortedBy(value){
         if(value == "hour"){
@@ -75,7 +72,6 @@ export class Reservation{
         }
     }
     static getSpecificDateReservations(dateObj){
-        console.log(DB_Reservation[0].date)
         //empty array to return
         let specificDateReservations = []
 

@@ -3,14 +3,14 @@
     <div class="bg-white w-4/6 m-auto mt-6" :class="{blurr: showModal}">
 
       <!-- header -->
-      <div class="header flex flex-row justify-start py-10 border-b-2 border-red-900">
+      <div class="header flex flex-row justify-center py-10 border-b-2 border-red-900">
         <!-- title -->
         <h1
-        class="text-red-700  text-3xl w-5/6 border-r-2 border-solid border-red-900 pt-6 font-bold"
+        class="text-red-700 text-3xl w-3/4 border-r-2 border-solid border-red-900 pt-6 font-bold"
         >Booking List</h1>
         <!-- new reservation button -->
         <button
-        class=" bg-red-100 hover:bg-red-900 hover:text-white text-black p-4 ml-2 rounded-e-xl mr-4"
+        class=" bg-red-100 hover:bg-red-900 hover:text-white text-black w-1/4 p-2 ml-2 rounded-e-xl mr-4"
         @click="toggleModal"
         >Add reservation</button>
       </div>
