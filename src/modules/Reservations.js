@@ -1,13 +1,12 @@
-import DB_Reservation from "../DB_reservation.json"
+import { reservations as DB_Reservation } from "../DB_reservation.js";
 
 export class Reservation{
     constructor(name, date, hour, seats){
-        this.nome = this.setName(name) 
-        this.date = this.setDate(date)
-        this.hour = this.setHour(hour) 
-        this.seats = this.setSeats(seats) 
+        this.setName(name) 
+        this.setDate(date)
+        this.setHour(hour) 
+        this.setSeats(seats) 
         this.uid = Symbol()
-        //pushToDB(this)
     }
 
     //setters
@@ -21,18 +20,17 @@ export class Reservation{
     }
     setDate(date){
         if(stringExistAndNotEmpty(date)){
-            this.date = date
+            this.date = date.toISOString()
         }
         else{
             throw new Error("date not valid")
         }
     }
-    setHour(hour){
-        if(stringExistAndNotEmpty(hour)){
-            let hh = hour.hour
-            let mm = hour.minutes
-            let ss = hour.seconds
-            this.hour = hh + ":" + mm + ":" + ss
+    setHour(hourObj){
+        if(stringExistAndNotEmpty(hourObj)){
+            let hh = hourObj.hours
+            let mm = hourObj.minutes
+            this.hour = hh + ":" + mm
         }
         else{
             throw new Error("hour not valid")   //TODO specificare poi perchè non valida
@@ -43,7 +41,7 @@ export class Reservation{
             throw new Error("seats number must be a number from 0 to 99") //TODO mby a better english lol
         }
         else{
-            this.seats = seats.toISOString()
+            this.seats = seats
         }
     }
 
@@ -91,6 +89,7 @@ export class Reservation{
         }
     }
     static getSpecificDateReservations(dateObj){
+        console.log(DB_Reservation[0].date)
         //empty array to return
         let specificDateReservations = []
 
@@ -108,7 +107,9 @@ export class Reservation{
         }
         return specificDateReservations
     }
-
+    static getAllReservations(){
+        return DB_Reservation
+    }
 }
 
 /* ---------- end of class ---------- */
@@ -121,6 +122,4 @@ function stringExistAndNotEmpty(string) {   //hoisted right?
         return true
     }
 }
-/* function getAllReservations(){
-    return DB_Reservation
-} */
+
