@@ -1,27 +1,26 @@
-ci sono essenzialmente 3 funzioni
-1) visualizzare la lista, con lo showAll che però va reimplementato
-2) il sistema di sorting 
-3) il sistema di editing delle entry
 
-iniziamo a settorializzarle
-
+//TODO il sistema di editing delle entry
 
 <template>
     <div>
         <!-- day chooser bar -->
-        <div class="my-5 flex flex-row justify-center max-[600px]:flex-col">  
+        <div class="my-5 flex flex-row justify-center max-[600px]:flex-col items-center">  
             <!-- seen with the day chooser -->
-            <div v-if="!showAll" class="flex flex-row flex-grow justify-center">
+            <div v-if="!showAll" class="flex flex-row flex-grow justify-center p-2 w-3/4 border-r-2 border-solid border-red-900">
                 <p @click="prevDate()" class="font-mono font-bold text-2xl rounded px-2 cursor-pointer hover:bg-red-900 hover:text-white" ><</p>
                 <p class="text-xl font-mono font-bold w-40">{{selectedDateLabel}}</p>   
                 <p @click="nextDate()" class="font-mono font-bold text-2xl rounded px-2 cursor-pointer hover:bg-red-900 hover:text-white">></p>
             </div>
-            <!-- seen of all reservation. deprecated -->
-            <!-- <div class="flex flex-row justify-right mx-10">
-                <input type="checkbox" id="showAll" class="py-auto" v-model="showAll">
-                <label for="showAll" class="pt-1">Show All</label>
-            </div> -->
-
+            <div class="w-1/4 flex flex-col">
+                <button
+                class=" bg-red-100 hover:bg-red-900 hover:text-white text-black text-sm rounded-e-xl ml-2 mr-4 my-1"
+                @click="sortByTime"
+                >Sort by hour</button>
+                <button
+                class=" bg-red-100 hover:bg-red-900 hover:text-white text-black text-sm rounded-e-xl ml-2 mr-4 my-1"
+                @click="sortBySeats"
+                >Sort by seats</button>
+            </div>
         </div>
 
         <!-- legenda -->
@@ -31,20 +30,6 @@ iniziamo a settorializzarle
             <p class="text-red-900">hour</p>
             <p class="text-red-900">seats</p>
         </div>
-
-  
-        <!-- list -->
-        <!-- vista con tutte le prenotazioni -->
-        <!-- <div v-if="showAll">
-            <ul v-for="(entry, index) in reservationData" :key="entry.uuid" class="grid grid-cols-5 py-2 h-auto hover:bg-gray-200 items-center max-[600px]:grid-cols-1 max-[600px]:border max-[600px]:border-red-900">
-                <actionsOnEntry @azioneRichiesta="handle_azioneRichiesta($event,entry.uuid)"></actionsOnEntry>
-                <li>{{entry.nome}}</li>
-                <li v-if="giornoLook == 'data'">{{entry.giorno}}</li>
-                <li v-if="giornoLook == 'giorno'">{{giorniDellaSettimanaArray[index]}}</li>
-                <li>{{entry.ora}}</li>
-                <li>{{entry.coperti}}</li>
-            </ul>
-        </div> -->
 
         <!-- selected day reservation -->
         <div v-if="!showAll">
@@ -63,7 +48,7 @@ iniziamo a settorializzarle
 
 <script>
 import actionsOnEntry from './actionsOnEntry.vue';
-import { isProxy, toRaw, ref } from 'vue';
+import { ref, toRaw } from 'vue';
 import { Reservation } from '@/modules/Reservations';
 
 export default {
@@ -80,8 +65,8 @@ export default {
         let selectedDateLabel = ref("")
         updateLabel()
 
-        //request reservations
-        let selectedDate_Reservations = ref([])
+        //request reservations //TODO make this an async function
+        let selectedDate_Reservations = ref()
         getSelectedDateReservations()
 
         function nextDate(){
@@ -116,24 +101,44 @@ export default {
         //reservation list handling
         function getSelectedDateReservations(){
             selectedDate_Reservations.value = Reservation.getSpecificDateReservations(selectedDate.value) //objects array
+            console.log("selectedDate_Reservations prePRE", selectedDate_Reservations.value)
         }
-       
+        
+        //sorting logic
+        function sortByTime(){
+            selectedDate_Reservations.value.sort((a, b) => {
+                const aHH = parseInt(a.hour.slice(0, 2))
+                const bHH = parseInt(b.hour.slice(0, 2))
+                const aMM = parseInt(a.hour.slice(3, 5))
+                const bMM = parseInt(b.hour.slice(3, 5))
+                if(aHH - bHH == 0){
+                    return aMM - bMM
+                }
+                else{
+                    return aHH - bHH
+                }
+            })
+        }
+        let toggleSortingSeatsDirection = 0
+        function sortBySeats(){
+            //switching sorting big->small to small->big and so on  
+            if(toggleSortingSeatsDirection %2 == 0){
+                selectedDate_Reservations.value.sort((a, b) => {return a.seats - b.seats})
+            }
+            else{
+                selectedDate_Reservations.value.sort((a, b) => {return b.seats - a.seats})
+            }
+            toggleSortingSeatsDirection++
+        }
 
         //--------------------------------------------------------------
         return{
             showAll,
             selectedDateLabel,
             selectedDate, selectedDate_Reservations, prevDate, nextDate,
+            sortByTime, sortBySeats
         }
     },
-
-    /* watch: {
-        reservationData(newValue, oldValue) {
-            console.log("rimontando la lista")
-            //this.$forceUpdate()
-            
-        }
-    }, */
 
         /* handle_azioneRichiesta(code, uuid){
             console.log("code: ", code)
@@ -141,30 +146,6 @@ export default {
             this.$emit("eseguiAzioneSuEntry", code, uuid)
         }, */
 
-        /* changeGiornoLook(){
-            if(this.giornoLook == "giorno"){
-                this.giornoLook = "data"
-            }
-            else if(this.giornoLook == "data"){
-                this.giornoLook = "giorno"
-                this.popolate_giorniDellaSettimanaArray()
-            }
-        }, */
-
-        /* popolate_giorniDellaSettimanaArray(){
-            this.giorniDellaSettimanaArray = []
-
-            this.reservationData.forEach((element) => {
-                console.log("popolamento giorni della settimana")
-                console.log(toRaw(element.giorno))
-                let date = toRaw(element.giorno)
-                let dateObj = new Date((date.match(/\d+/g)[2]), (date.match(/\d+/g)[1]-1), (date.match(/\d+/g)[0]))    //(year, monthIndex, day)
-                console.log(dateObj)
-                let dayOfTheWeek = this.findDayOfWeek(dateObj.getDay())
-                console.log("dayOfTheWeek", dayOfTheWeek)
-                console.log("giorniDellaSettimanaArray", this.giorniDellaSettimanaArray)
-                this.giorniDellaSettimanaArray.push(dayOfTheWeek)
-            }); */
 }
 </script>
 

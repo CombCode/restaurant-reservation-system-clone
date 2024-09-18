@@ -45,20 +45,6 @@ export class Reservation{
         }
     }
 
-    //getters
-    /* getNome(uid){
-
-    }
-    getDate(uid){
-
-    }
-    getHour(uid){
-
-    }
-    getSeats(uid){
-
-    } */
-    
     //static metods
     static pushToDB(obj){
         DB_Reservation.push(obj)   //the db is an array of objects
@@ -107,7 +93,7 @@ export class Reservation{
         }
         return specificDateReservations
     }
-    static getAllReservations(){
+    static getAllReservations(){    //only for debugging purpose
         return DB_Reservation
     }
 }
