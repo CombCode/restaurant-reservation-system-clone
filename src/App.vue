@@ -15,23 +15,12 @@
         >Add reservation</button>
       </div>
 
-      <!-- sorting tab -->
-      <div class=" font-mono bold sortingTab flex justify-center flex-row max-[600px]:flex-col mb-6">
-       <!--  <div class="p-1 bg-white w-1/2" @click="sortX_orario"> //TODO redo sorting logic
-          <p class="m-4 border rounded-2xl hover:bg-red-900 hover:text-white shadow shadow-black hover:shadow-2xl">sort by hour</p>
-        </div>
-        <div class="p-1 bg-white w-1/2" @click="sortX_coperti"> //TODO redo sorting logic
-          <p class="m-4 border rounded-2xl hover:bg-red-900 hover:text-white shadow shadow-black hover:shadow-2xl">sort by seats</p>
-        </div> -->
-      </div>
-
       <!-- lista booking -->
       <BookingList :reservationData="reservationData" @eseguiAzioneSuEntry="handleAzioneSuEntry" v-if="showBookingList"></BookingList>
- 
     </div>
     
     <!-- newEntryModal -->
-    <NewEntryModal v-if="showModal" @close="toggleModal" :currentEntryToEdit={currentEntryToEdit}></NewEntryModal>
+    <NewEntryModal v-if="showModal" @close="toggleModal"></NewEntryModal>
   </div>
 </template>
 
@@ -40,54 +29,29 @@
 import BookingList from './components/booking-list.vue';
 import NewEntryModal from './components/newEntry-PopUp.vue';
 
+import { ref } from 'vue'
+
 export default {
   name: 'App',
-  components: {
-    BookingList, NewEntryModal
-  },
-  data(){
-    return{
-      showModal: false,
-      showBookingList: true,  
+  components: { BookingList, NewEntryModal },
+  setup(){
+
+    //show new reserv. modal logic
+    let showModal = ref(false)
+    function toggleModal(){
+      showModal.value = !showModal.value
+      this.forceReloadList()  
     }
-  },
-  methods:{
-    toggleModal(){
-      this.showModal = !this.showModal;
-      if(this.showModal == false){
-        this.forceReloadList()   
-      }
-      
-    },
-    forceReloadList() {
-        // Remove my-component from the DOM
-        this.showBookingList = false;
 
-        this.$nextTick(() => {
-          // Add the component back in
-          this.showBookingList = true;
-        });
-    },
+    //reloading booking list logic
+    let showBookingList = ref(true)
+    function forceReloadList(){
+      showBookingList.value = false;
+      setTimeout(() => {showBookingList.value = true}, 1000);
+    }
 
-    /* sortX_orario(){
-      this.reservationData = this.reservationData.sort((a, b) => {
-
-        //se le ore sono uguali passo ai minuti
-        if(a.ora.match(/\d+/g)[0] == b.ora.match(/\d+/g)[0]){
-          return parseInt(a.ora.match(/\d+/g)[1]) - parseInt(b.ora.match(/\d+/g)[1])
-        }
-        //senno confronto le ore
-        else{
-          return parseInt(a.ora.match(/\d+/g)[0]) - parseInt(b.ora.match(/\d+/g)[0])
-        }   
-      })
-      this.forceShowBookingList()
-    },
-    sortX_coperti(){
-      this.reservationData = this.reservationData.sort((a, b) => a.coperti - b.coperti)
-      this.forceShowBookingList()
-    } */
-  },
+    return{showModal, toggleModal, showBookingList, forceReloadList}
+  }
   /* mounted(){
     this.reservationData = compileExamples(10)  //TODO set a examples creator
     this.forceShowBookingList()

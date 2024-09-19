@@ -73,7 +73,6 @@ export default {
     function saveReservation(){
       try{
         let reservation = new Reservation(newName.value, newDate.value, toRaw(newHour.value), newSeats.value)
-        console.log("oRaw(newHour.value)",  toRaw(newHour.value))
         Reservation.pushToDB(reservation)
         escForm()
       }

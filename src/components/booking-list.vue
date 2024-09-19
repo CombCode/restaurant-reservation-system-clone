@@ -141,7 +141,7 @@ export default {
             switch(action){
                 case "arrived" : {
                     //new computedReservation object
-                     let computedReservation
+                    let computedReservation
                     try{
                         computedReservation = new ComputedReservation(reservation.name, selectedDate.value, reservation.hour, reservation.seats, "arrived")
                     }
@@ -153,6 +153,7 @@ export default {
                     ComputedReservation.pushToDB(computedReservation)
                     //delete from general DB
                     Reservation.deleteFromDB(reservation)
+                    //trigger the reload of list view
                     getSelectedDateReservations()
                     break
                 }
@@ -170,10 +171,12 @@ export default {
                     ComputedReservation.pushToDB(computedReservation)
                     //delete from general DB
                     Reservation.deleteFromDB(reservation)
+                    //trigger the reload of list view
                     getSelectedDateReservations()
                     break
                 }
                 case "edit" : {
+                    
                     break
                 }
                 case "delete" : {
