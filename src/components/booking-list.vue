@@ -51,6 +51,7 @@
 import actionsOnEntry from './actionsOnEntry.vue';
 import { ref, toRaw } from 'vue';
 import { Reservation } from '@/modules/Reservations';
+import { ComputedReservation } from '@/modules/ComputedReserations';
 
 export default {
     components: {
@@ -139,17 +140,46 @@ export default {
 
             switch(action){
                 case "arrived" : {
-
+                    //new computedReservation object
+                     let computedReservation
+                    try{
+                        computedReservation = new ComputedReservation(reservation.name, selectedDate.value, reservation.hour, reservation.seats, "arrived")
+                    }
+                    catch(error){
+                        console.log("error")
+                        //TODO
+                    }
+                    //save the new object on computed DB
+                    ComputedReservation.pushToDB(computedReservation)
+                    //delete from general DB
+                    Reservation.deleteFromDB(reservation)
+                    getSelectedDateReservations()
+                    break
                 }
                 case "noShow" : {
-
+                    //new computedReservation object
+                    let computedReservation 
+                    try{
+                        computedReservation = new ComputedReservation(reservation.name, selectedDate.value, reservation.hour, reservation.seats, "noShow")    
+                    }
+                    catch(error){
+                        console.log("error")
+                        //TODO
+                    }
+                    //save the new object on computed DB
+                    ComputedReservation.pushToDB(computedReservation)
+                    //delete from general DB
+                    Reservation.deleteFromDB(reservation)
+                    getSelectedDateReservations()
+                    break
                 }
                 case "edit" : {
-
+                    break
                 }
                 case "delete" : {
                     Reservation.deleteFromDB(reservation)
                     getSelectedDateReservations()
+                    break
                 }
             }
         }

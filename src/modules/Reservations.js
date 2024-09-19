@@ -58,7 +58,7 @@ export class Reservation{
         }
     }
     static deleteFromDB(reservationObj){
-        DB_Reservation.splice(DB_Reservation.indexOf(toRaw(reservationObj)), 1)
+        DB_Reservation.splice(DB_Reservation.indexOf(toRaw(reservationObj)), 1) 
     }
     static getReservationsSortedBy(value){
         if(value == "hour"){
