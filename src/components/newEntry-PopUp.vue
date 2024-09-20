@@ -71,7 +71,6 @@ export default {
 
   setup(props, { emit }){
 
-    console.log("prop", props.reservationToEdit)
     let newName = ref(props.reservationToEdit?.name || null) 
     let newDate = ref()
     let newHour = ref()

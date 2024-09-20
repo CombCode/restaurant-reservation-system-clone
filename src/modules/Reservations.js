@@ -27,19 +27,28 @@ export class Reservation{
             throw new Error("date not valid")
         }
     }
-    setHour(hourObj){
-        if(stringExistAndNotEmpty(hourObj)){
-            let hh = hourObj.hours
-            let mm = hourObj.minutes
-            this.hour = hh + ":" + mm
+    setHour(hour){ //hour can be an obj with .hour and .minutes or a "HH:MM" string
+        if(stringExistAndNotEmpty(hour)){ //better to add other checks over string hour format
+            if(typeof hour == "object"){
+                let hh = hour.hours
+                let mm = hour.minutes
+                this.hour = hh + ":" + mm
+            }
+            else if(typeof hour == "string"){
+                this.hour = hour
+            }
+            else{
+                throw new Error("hour not valid")   //TODO better to say why instead of console.
+            }
+            
         }
         else{
-            throw new Error("hour not valid")   //TODO specificare poi perchè non valida
+            throw new Error("hour not valid")   //TODO better to say why instead of console.
         }
     }
     setSeats(seats){
         if(isNaN(seats) || parseInt(seats) < 0 || parseInt(seats) > 99){
-            throw new Error("seats number must be a number from 0 to 99") //TODO mby a better english lol
+            throw new Error("Seat numbers must be a whole number between 0 and 99") //
         }
         else{
             this.seats = seats

@@ -154,8 +154,6 @@ export default {
                     ComputedReservation.pushToDB(computedReservation)
                     //delete from general DB
                     Reservation.deleteFromDB(reservation)
-                    //trigger the reload of list view
-                    getSelectedDateReservations()
                     break
                 }
                 case "noShow" : {
@@ -172,8 +170,6 @@ export default {
                     ComputedReservation.pushToDB(computedReservation)
                     //delete from general DB
                     Reservation.deleteFromDB(reservation)
-                    //trigger the reload of list view
-                    getSelectedDateReservations()
                     break
                 }
                 case "edit" : {
@@ -182,16 +178,15 @@ export default {
                     emit("editReservation", reservation)
                     //delete from general DB the wrong one
                     Reservation.deleteFromDB(reservation)
-                    //trigger the reload of list view
-                    getSelectedDateReservations()
                     break
                 }
                 case "delete" : {
                     Reservation.deleteFromDB(reservation)
-                    getSelectedDateReservations()
                     break
                 }
             }
+            //trigger the reload of list view
+            getSelectedDateReservations()
         }
 
         //show All function handling
