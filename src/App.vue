@@ -30,11 +30,15 @@ import BookingList from './components/booking-list.vue';
 import NewEntryModal from './components/newEntry-PopUp.vue';
 
 import { ref } from 'vue'
+import { createExamples } from '@/modules/examplesMaker.js'
 
 export default {
   name: 'App',
   components: { BookingList, NewEntryModal },
   setup(){
+
+    //popolate reservation example DB
+    createExamples()
 
     //show new reserv. modal logic
     let showModal = ref(false)
@@ -52,10 +56,6 @@ export default {
 
     return{showModal, toggleModal, handleEditReservation, reservationToEdit}
   }
-  /* mounted(){
-    this.reservationData = compileExamples(10)  //TODO set a examples creator
-    this.forceShowBookingList()
-  } */
 }
 
 </script>

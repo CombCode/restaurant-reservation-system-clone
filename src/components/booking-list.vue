@@ -2,14 +2,14 @@
     <div>
         <!-- day chooser bar -->
         <div class="my-5 flex flex-row justify-center max-[600px]:flex-col items-center">  
-            <!-- day chooser with label -->
-            <div class="flex flex-row justify-center py-2 w-3/4 border-r-2 border-solid border-red-900">
+            <!-- day chooser label -->
+            <div class="flex flex-row justify-center py-6 w-3/4 border-r-2 border-solid border-red-900">
                 <p @click="prevDate()" class="font-mono font-bold text-2xl rounded px-2 cursor-pointer hover:bg-red-900 hover:text-white" ><</p>
                 <p class="text-xl font-mono font-bold w-40">{{selectedDateLabel}}</p>   
                 <p @click="nextDate()" class="font-mono font-bold text-2xl rounded px-2 cursor-pointer hover:bg-red-900 hover:text-white">></p>
             </div>
             <!-- sorting buttons -->
-            <div class="w-1/4 ml-2 rounded-e-xl mr-4 m flex flex-col">
+            <div class="w-1/4 ml-2 rounded-e-xl mr-4 flex flex-col">
                 <button
                 class=" bg-red-100 hover:bg-red-900 hover:text-white text-black text-sm rounded-e-xl my-1"
                 @click="sortByTime"
@@ -20,9 +20,10 @@
                 >Sort by seats</button>
                 <!-- show all button -->
                 <button
-                class=" bg-red-100 hover:bg-red-900 hover:text-white text-black text-sm rounded-e-xl my-1"
+                class="text-sm my-1 rounded-e-xl"
+                :class="{'bg-red-900 text-white ': showAll, 'bg-red-100 text-black': !showAll}"
                 @click="toggleShowAll"
-                >show all</button>
+                >Show all</button>
             </div>
         </div>
 
