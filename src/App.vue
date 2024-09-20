@@ -1,16 +1,29 @@
+<!-- 
+Next TODOS
+1) swipe animation for reservations list and label
+2) mobile screen adaptation
+ -->
+
 <template>
   <div class="backgrownd bg-gray-500 w-screen h-screen fixed top-0 overflow-auto" >
-    <div class="bg-white w-4/6 m-auto mt-6" :class="{blurr: showModal}">
+    <div 
+    class="bg-white w-11/12 m-auto mt-6
+    md:w-4/6" 
+    :class="{blurr: showModal}">
 
       <!-- header -->
-      <div class="header flex flex-row justify-center py-10 border-b-2 border-red-900">
+      <div 
+      class="header flex flex-col justify-center items-center py-4 border-b-2 border-red-900
+      md:flex-row md:py-10">
         <!-- title -->
         <h1
-        class="text-red-700 text-3xl w-3/4 border-r-2 border-solid border-red-900 pt-6 font-bold"
+        class="text-red-700 text-3xl w-3/4 border-solid border-red-900 pt-6 font-bold
+        md:border-r-2"
         >Booking List</h1>
         <!-- new reservation button -->
         <button
-        class=" bg-red-100 hover:bg-red-900 hover:text-white text-black w-1/4 p-2 ml-2 rounded-e-xl mr-4"
+        class="bg-red-100 hover:bg-red-900 hover:text-white text-black p-2 m-4
+        md:rounded-e-xl md:mr-4 md:ml-2 md:w-1/4 md:p-4 md:text-xl"
         @click="toggleModal"
         >Add reservation</button>
       </div>

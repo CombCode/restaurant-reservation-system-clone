@@ -25,6 +25,4 @@ export function createExamples(){
         let newReservation = new Reservation(names[i], tomorrow, hours[i], seats[i])
         Reservation.pushToDB(newReservation)
     }
-
-    console.log("reservatios DB: ", Reservation.getAllReservations())
 }
