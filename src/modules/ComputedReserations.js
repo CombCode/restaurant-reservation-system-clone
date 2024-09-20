@@ -25,11 +25,29 @@
         DB_computedReservation.push(obj) //the db is an array of objects
     }
     static getReservationFromDB(reservationObj){   //TODO see if better to pass obj or uid
-        for(let reservation of DB_ComputedReservation){
+        for(let reservation of DB_computedReservation){
             if(reservation == reservationObj){
                 return reservation
             }
         }
+    }
+    static getSpecificDateReservations(dateObj){
+        //empty array to return
+        let specificDateReservations = []
+
+        //input obj converted into only date string
+        dateObj = dateObj.toISOString().split('T')[0]
+
+        //loop in the DB array to find reservation objects with our date
+        for(let reservation of DB_computedReservation){
+             //DB iso string date converted into only date string
+            let reservationDate = reservation.date.split('T')[0]
+
+            if(reservationDate == dateObj){  
+                specificDateReservations.push(reservation)
+            }
+        }
+        return specificDateReservations
     }
 }
 

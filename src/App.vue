@@ -16,11 +16,11 @@
       </div>
 
       <!-- lista booking -->
-      <BookingList :reservationData="reservationData" @eseguiAzioneSuEntry="handleAzioneSuEntry" v-if="showBookingList"></BookingList>
+      <BookingList @editReservation="handleEditReservation"></BookingList>
     </div>
     
     <!-- newEntryModal -->
-    <NewEntryModal v-if="showModal" @close="toggleModal"></NewEntryModal>
+    <NewEntryModal v-if="showModal" @close="toggleModal" :reservationToEdit="reservationToEdit"></NewEntryModal>
   </div>
 </template>
 
@@ -40,17 +40,17 @@ export default {
     let showModal = ref(false)
     function toggleModal(){
       showModal.value = !showModal.value
-      this.forceReloadList()  
+      
+    }
+    //modify a reservation logic
+    let reservationToEdit = ref()
+    function handleEditReservation(reservation){
+      console.log("handling the modif in app.vue", reservation)
+      reservationToEdit.value = reservation
+      toggleModal()
     }
 
-    //reloading booking list logic
-    let showBookingList = ref(true)
-    function forceReloadList(){
-      showBookingList.value = false;
-      setTimeout(() => {showBookingList.value = true}, 1000);
-    }
-
-    return{showModal, toggleModal, showBookingList, forceReloadList}
+    return{showModal, toggleModal, handleEditReservation, reservationToEdit}
   }
   /* mounted(){
     this.reservationData = compileExamples(10)  //TODO set a examples creator

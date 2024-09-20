@@ -1,12 +1,9 @@
-
-//TODO il sistema di editing delle entry
-
 <template>
     <div>
         <!-- day chooser bar -->
         <div class="my-5 flex flex-row justify-center max-[600px]:flex-col items-center">  
             <!-- day chooser with label -->
-            <div v-if="!showAll" class="flex flex-row justify-center py-2 w-3/4 border-r-2 border-solid border-red-900">
+            <div class="flex flex-row justify-center py-2 w-3/4 border-r-2 border-solid border-red-900">
                 <p @click="prevDate()" class="font-mono font-bold text-2xl rounded px-2 cursor-pointer hover:bg-red-900 hover:text-white" ><</p>
                 <p class="text-xl font-mono font-bold w-40">{{selectedDateLabel}}</p>   
                 <p @click="nextDate()" class="font-mono font-bold text-2xl rounded px-2 cursor-pointer hover:bg-red-900 hover:text-white">></p>
@@ -21,29 +18,38 @@
                 class=" bg-red-100 hover:bg-red-900 hover:text-white text-black text-sm rounded-e-xl my-1"
                 @click="sortBySeats"
                 >Sort by seats</button>
+                <!-- show all button -->
+                <button
+                class=" bg-red-100 hover:bg-red-900 hover:text-white text-black text-sm rounded-e-xl my-1"
+                @click="toggleShowAll"
+                >show all</button>
             </div>
         </div>
 
         <!-- legenda -->
-        <div class="grid border-b-2 border-solid border-grey-200 mb-4 max-[600px]:invisible" :class="{ 'grid-cols-5' : showAll, 'grid-cols-4' : !showAll}">
+        <div class="grid border-b-2 border-solid border-grey-200 mb-4 max-[600px]:invisible grid-cols-4">
             <p class="text-red-900">actions</p>
             <p class="text-red-900">name</p>
             <p class="text-red-900">hour</p>
             <p class="text-red-900">seats</p>
         </div>
 
-        <!-- selected day reservation -->
-        <div v-if="!showAll">
-            <ul v-for="reservation of selectedDate_Reservations" :key="reservation.uid" 
-            class="grid grid-cols-4 py-2 h-auto
-            hover:bg-gray-200 items-center 
-            max-[600px]:grid-cols-1 max-[600px]:border max-[600px]:border-red-900">
-                <actionsOnEntry @actionOnReservation="(action) => handleActionOnReservation(action, reservation)"></actionsOnEntry>
-                <li>{{reservation.name}}</li>
-                <li>{{reservation.hour}}</li>
-                <li>{{reservation.seats}}</li>
+        <!-- selected day reservations -->
+        <div>
+            <ul v-for="reservation of selectedDate_Reservations" :key="reservation.uid">
+                <div 
+                class="grid grid-cols-4 py-2 h-auto
+                hover:bg-gray-200 items-center 
+                max-[600px]:grid-cols-1 max-[600px]:border max-[600px]:border-red-900"
+                :class="{'bg-green-200': reservation.tag == 'arrived', 'bg-orange-200': reservation.tag == 'noShow'}">
+                    <actionsOnEntry @actionOnReservation="(action) => handleActionOnReservation(action, reservation)"></actionsOnEntry>
+                    <li>{{reservation.name}}</li>
+                    <li>{{reservation.hour}}</li>
+                    <li>{{reservation.seats}}</li>
+                </div>
+
             </ul>
-        </div> 
+        </div>
     </div>
 </template>
 
@@ -58,9 +64,7 @@ export default {
         actionsOnEntry
     },
 
-    setup(){
-        let showAll = ref(false)    //TODO delete in a close future
-
+    setup(props, { emit }){
 
         //date to show logic
         let selectedDate = ref(new Date()) //init at today
@@ -68,7 +72,7 @@ export default {
         updateLabel()
 
         //request reservations //TODO make this an async function
-        let selectedDate_Reservations = ref()
+        let selectedDate_Reservations = ref()   //list view reload when this var change
         getSelectedDateReservations()
 
         function nextDate(){
@@ -134,10 +138,6 @@ export default {
 
         //Actions on reservations handling
         function handleActionOnReservation(action, reservation){
-            console.log("handleActionOnReservation triggered")
-            console.log("action: ", action)
-            console.log("reservation: ", reservation)
-
             switch(action){
                 case "arrived" : {
                     //new computedReservation object
@@ -176,7 +176,13 @@ export default {
                     break
                 }
                 case "edit" : {
-                    
+                    //delegate to App.js and than to newEntry-PopUp the creation of
+                    //a new sobstitute reservation 
+                    emit("editReservation", reservation)
+                    //delete from general DB the wrong one
+                    Reservation.deleteFromDB(reservation)
+                    //trigger the reload of list view
+                    getSelectedDateReservations()
                     break
                 }
                 case "delete" : {
@@ -187,13 +193,33 @@ export default {
             }
         }
 
+        //show All function handling
+        let showAll = ref(false)
+        function toggleShowAll(){
+
+            showAll.value = !showAll.value
+
+            //computed reservation objs array
+            let computed_reservations = ComputedReservation.getSpecificDateReservations(selectedDate.value) //objects array
+
+            if(showAll.value){ 
+                //adding the computed reservations to the view selected date reservations array
+                selectedDate_Reservations.value = selectedDate_Reservations.value.concat(computed_reservations)
+            }
+            else{
+                //subtract the computed reservations to the view selected date reservations array
+                selectedDate_Reservations.value = selectedDate_Reservations.value.filter(res => !computed_reservations.includes(toRaw(res)))
+            }
+        }
+
+
         //--------------------------------------------------------------
         return{
-            showAll,
+            showAll, toggleShowAll,
             selectedDateLabel,
             selectedDate, selectedDate_Reservations, prevDate, nextDate,
             sortByTime, sortBySeats,
-            handleActionOnReservation
+            handleActionOnReservation  
         }
     },
 

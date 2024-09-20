@@ -59,16 +59,23 @@ import VueDatePicker from '@vuepic/vue-datepicker';
 import '@vuepic/vue-datepicker/dist/main.css';
 import { ref, toRaw } from 'vue';
 
+import { defineComponent } from 'vue';
+
 export default {
-  
-  props:["currentEntryToEdit"],
+  props: {
+    reservationToEdit: {
+      type: Object,
+      required: false
+    }
+  },
 
   setup(props, { emit }){
-    
-    let newName = ref()
+
+    console.log("prop", props.reservationToEdit)
+    let newName = ref(props.reservationToEdit?.name || null) 
     let newDate = ref()
     let newHour = ref()
-    let newSeats = ref()
+    let newSeats = ref(props.reservationToEdit?.seats || null)
 
     function saveReservation(){
       try{
@@ -93,6 +100,8 @@ export default {
       errorGlow.value = true
       setTimeout(() => {errorGlow.value = false}, 2000)
     }
+
+    //edit a reservation logic
 
     //close form
     function escForm(){
