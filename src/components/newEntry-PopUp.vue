@@ -7,8 +7,8 @@
 
     <!-- modal window -->
     <div 
-    class="modal bg-red-50 my-20 mx-40 flex flex-col justify-around items-center rounded-xl shadow-2xl shadow-black 
-    max-[600px]:mx-0"
+    class="modal bg-white my-20 mx-2 flex flex-col justify-around items-center rounded-xl shadow-2xl shadow-black 
+    md:mx-40"
     @keypress.enter="saveReservation">
       
       <!-- title -->

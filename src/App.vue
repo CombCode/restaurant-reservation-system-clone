@@ -7,17 +7,17 @@ Next TODOS
 <template>
   <div class="backgrownd bg-gray-500 w-screen h-screen fixed top-0 overflow-auto" >
     <div 
-    class="bg-white w-11/12 m-auto mt-6
+    class="bg-white w-11/12 m-auto rounded-xl my-6
     md:w-4/6" 
     :class="{blurr: showModal}">
 
       <!-- header -->
       <div 
-      class="header flex flex-col justify-center items-center py-4 border-b-2 border-red-900
-      md:flex-row md:py-10">
+      class="header flex flex-col justify-center items-center py-10 border-b-2 border-red-900
+      md:flex-row">
         <!-- title -->
         <h1
-        class="text-red-700 text-3xl w-3/4 border-solid border-red-900 pt-6 font-bold
+        class="text-red-700 text-3xl w-3/4 border-solid border-red-900 py-3 my-3 font-bold
         md:border-r-2"
         >Booking List</h1>
         <!-- new reservation button -->

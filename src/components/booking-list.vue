@@ -1,26 +1,38 @@
 <template>
     <div>
         <!-- day chooser bar -->
-        <div class="my-5 flex flex-row justify-center max-[600px]:flex-col items-center">  
+        <div class=" flex justify-center flex-col items-center
+        md:flex-row md:my-5">  
             <!-- day chooser label -->
-            <div class="flex flex-row justify-center py-6 w-3/4 border-r-2 border-solid border-red-900">
-                <p @click="prevDate()" class="font-mono font-bold text-2xl rounded px-2 cursor-pointer hover:bg-red-900 hover:text-white" ><</p>
-                <p class="text-xl font-mono font-bold w-40">{{selectedDateLabel}}</p>   
-                <p @click="nextDate()" class="font-mono font-bold text-2xl rounded px-2 cursor-pointer hover:bg-red-900 hover:text-white">></p>
+            <div class="flex flex-row justify-center items-center py-6 w-3/4
+            md:border-r-2 md:border-solid md:border-red-900">
+                <p @click="prevDate()" 
+                class="border-2 border-red-200 rounded font-mono font-bold text-2xl  rounded-l-xl px-2 cursor-pointer hover:bg-red-900 hover:text-white
+                md:border-0" ><</p>
+                <p 
+                class="text-xl font-mono font-bold w-40 mx-6
+                md:mx-0">{{selectedDateLabel}}</p>   
+                <p @click="nextDate()" 
+                class="border-2 border-red-200 font-mono font-bold text-2xl rounded-r-xl px-2 cursor-pointer hover:bg-red-900 hover:text-white
+                md:border-0">></p>
             </div>
             <!-- sorting buttons -->
-            <div class="w-1/4 ml-2 rounded-e-xl mr-4 flex flex-col">
+            <div class="w-full rounded-e-xl flex flex-row justify-evenly
+            md:flex-col md:w-1/4 md:ml-2 md:mr-4">
                 <button
-                class=" bg-red-100 hover:bg-red-900 hover:text-white text-black text-sm rounded-e-xl my-1"
+                class=" bg-red-100 hover:bg-red-900 hover:text-white text-black text-sm my-1 p-4 rounded
+                md:rounded-e-xl md:p-0"
                 @click="sortByTime"
                 >Sort by hour</button>
                 <button
-                class=" bg-red-100 hover:bg-red-900 hover:text-white text-black text-sm rounded-e-xl my-1"
+                class=" bg-red-100 hover:bg-red-900 hover:text-white text-black text-sm my-1 p-4 rounded
+                md:rounded-e-xl md:p-0"
                 @click="sortBySeats"
                 >Sort by seats</button>
                 <!-- show all button -->
                 <button
-                class="text-sm my-1 rounded-e-xl"
+                class="text-sm my-1 p-4 rounded
+                md:rounded-e-xl md:p-0"
                 :class="{'bg-red-900 text-white ': showAll, 'bg-red-100 text-black': !showAll}"
                 @click="toggleShowAll"
                 >Show all</button>
@@ -28,7 +40,8 @@
         </div>
 
         <!-- legenda -->
-        <div class="grid border-b-2 border-solid border-grey-200 mb-4 max-[600px]:invisible grid-cols-4">
+        <div class="grid border-b-2 border-solid border-grey-200 mb-4 invisible grid-cols-4
+        md:visible">
             <p class="text-red-900">actions</p>
             <p class="text-red-900">name</p>
             <p class="text-red-900">hour</p>
@@ -39,14 +52,24 @@
         <div>
             <ul v-for="reservation of selectedDate_Reservations" :key="reservation.uid">
                 <div 
-                class="grid grid-cols-4 py-2 h-auto
+                class="grid py-2 h-auto grid-cols-2 grid-rows-3 border-t border-red-900 mx-5
                 hover:bg-gray-200 items-center 
-                max-[600px]:grid-cols-1 max-[600px]:border max-[600px]:border-red-900"
+                md:grid-cols-4 md:grid-rows-1 md:border-t-0 md:mx-0"
                 :class="{'bg-green-200': reservation.tag == 'arrived', 'bg-orange-200': reservation.tag == 'noShow'}">
-                    <actionsOnEntry @actionOnReservation="(action) => handleActionOnReservation(action, reservation)"></actionsOnEntry>
-                    <li>{{reservation.name}}</li>
-                    <li>{{reservation.hour}}</li>
-                    <li>{{reservation.seats}}</li>
+                    <actionsOnEntry @actionOnReservation="(action) => handleActionOnReservation(action, reservation)"
+                    class="col-span-1 row-span-3"></actionsOnEntry>
+                    <li class="grid grid-cols-2 grid-rows-1 md:grid-cols-1">
+                        <p class="text-sm text-gray-500 md:invisible">name:</p>
+                        <p>{{reservation.name}}</p>
+                    </li>
+                    <li class="grid grid-cols-2 grid-rows-1 md:grid-cols-1">
+                        <p class="text-sm text-gray-500 md:invisible">hour:</p>
+                        <p>{{reservation.hour}}</p>
+                    </li>
+                    <li class="grid grid-cols-2 grid-rows-1 md:grid-cols-1">
+                        <p class="text-sm text-gray-500 md:invisible">seats:</p>
+                        <p>{{reservation.seats}}</p>
+                    </li>
                 </div>
 
             </ul>
