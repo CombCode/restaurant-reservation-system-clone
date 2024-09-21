@@ -7,13 +7,13 @@
             <div class="flex flex-row justify-center items-center py-6 w-3/4
             md:border-r-2 md:border-solid md:border-red-900">
                 <p @click="prevDate()" 
-                class="border-2 border-red-200 rounded font-mono font-bold text-2xl  rounded-l-xl px-2 cursor-pointer hover:bg-red-900 hover:text-white
+                class="border-red-200 rounded font-mono font-bold text-2xl  rounded-l-xl px-2 cursor-pointer hover:bg-red-900 hover:text-white
                 md:border-0" ><</p>
                 <p 
                 class="text-xl font-mono font-bold w-40 mx-6
                 md:mx-0">{{selectedDateLabel}}</p>   
                 <p @click="nextDate()" 
-                class="border-2 border-red-200 font-mono font-bold text-2xl rounded-r-xl px-2 cursor-pointer hover:bg-red-900 hover:text-white
+                class="border-red-200 font-mono font-bold text-2xl rounded-r-xl px-2 cursor-pointer hover:bg-red-900 hover:text-white
                 md:border-0">></p>
             </div>
             <!-- sorting buttons -->
@@ -57,7 +57,9 @@
                 md:grid-cols-4 md:grid-rows-1 md:border-t-0 md:mx-0"
                 :class="{'bg-green-200': reservation.tag == 'arrived', 'bg-orange-200': reservation.tag == 'noShow'}">
                     <actionsOnEntry @actionOnReservation="(action) => handleActionOnReservation(action, reservation)"
-                    class="col-span-1 row-span-3"></actionsOnEntry>
+                    class="col-span-1 row-span-3"
+                    :class="{'pointer-events-none': reservation.tag}">
+                    </actionsOnEntry>
                     <li class="grid grid-cols-2 grid-rows-1 md:grid-cols-1">
                         <p class="text-sm text-gray-500 md:invisible">name:</p>
                         <p>{{reservation.name}}</p>
