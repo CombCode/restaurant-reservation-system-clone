@@ -1,222 +1,118 @@
 <template>
-  <div class="backgrownd bg-red-200 bg-opacity-50 w-screen h-screen fixed top-0 bg-cover" @click.self="escForm">
-    <div class="modal bg-red-50 my-20 mx-40 flex flex-col justify-around items-center rounded-xl shadow-2xl shadow-black max-[600px]:mx-0 " @keyup.enter="sendData">
 
-      <h1 class=" my-5 text-3xl font-bold text-red-600 ">Dati prenotazione</h1>
+  <!-- blurred container -->
+  <div 
+  class="backgrownd bg-red-200 bg-opacity-50 w-screen h-screen fixed top-0 bg-cover"
+  @click.self="escForm">
 
-      <label for="nome">nome</label>
-      <input type="text" id="nome" v-model="nome" class="formInput">
+    <!-- modal window -->
+    <div 
+    class="modal bg-white my-20 mx-2 flex flex-col justify-around items-center rounded-xl shadow-2xl shadow-black 
+    md:mx-40"
+    @keypress.enter="saveReservation">
+      
+      <!-- title -->
+      <h1 
+      class="my-5 text-3xl font-bold text-red-600"
+      >New Reservation</h1>
 
-      <label for="giorno">giorno</label>  
-      <!-- <input type="text" id="giorno" v-model="giorno"> -->
-      <VueDatePicker class="formInput" v-model="date" @update:model-value="parsingDateformat" locale="it" auto-apply :enable-time-picker="false" :format="format" input-class-name="dp-custom">
-        <template #input-icon="{ clear }">
-        </template>
-        <template #clear-icon="{ clear }">
-        </template>
+      <!-- name input -->
+      <label for="nome">name</label>
+      <input type="text" id="nome" v-model="newName" class="formInput">
+
+      <!-- day input -->
+      <label for="giorno">date</label>
+      <VueDatePicker class="formInput" v-model="newDate" locale="it" auto-apply :enable-time-picker="false" input-class-name="dp-custom">
+        <template #input-icon="{ clear }"></template>
+        <template #clear-icon="{ clear }"></template>
       </VueDatePicker>
 
-      <label for="ora">ora</label>
-      <!-- <input type="text" id="ora" v-model="ora">  -->
-      <VueDatePicker v-model="time" time-picker @update:model-value="parsingHourformat" locale="it" :start-time="startTime" minutes-increment="15" minutes-grid-increment="15" :min-time="{ hours: 12, minutes: 0 }" :max-time="{ hours: 22, minutes: 0 }" input-class-name="dp-custom" class="formInput">
-        <template #input-icon="{ clear }">
-        </template>
-        <template #clear-icon="{ clear }">
-        </template>
+      <!-- hour input -->
+      <label for="ora">hour</label>
+      <VueDatePicker v-model="newHour" time-picker locale="it" minutes-increment="15" minutes-grid-increment="15" :min-time="{ hours: 12, minutes: 0 }" :max-time="{ hours: 22, minutes: 0 }" input-class-name="dp-custom" class="formInput">
+        <template #input-icon="{ clear }"></template>
+        <template #clear-icon="{ clear }"></template>
       </VueDatePicker>
 
-      <label for="coperti">coperti</label>
-      <input type="text" id="coperti" v-model="coperti" class="formInput">
+      <!-- seats input -->
+      <label for="coperti">seats</label>
+      <input type="text" id="coperti" v-model="newSeats" class="formInput">
 
-      <!-- feedback input -->
-      <p class="text-red-600 my-3 text-xs px-2 rounded-xl" v-if="feedbackInputGiorno" :class="{ glow : highLight }">{{feedbackInputGiorno}}</p>
-      <p class="text-red-600 my-3 text-xs px-2 rounded-xl" v-if="feedbackInputOra" :class="{ glow : highLight }">{{feedbackInputOra}}</p>
-      <p class="text-red-600 my-3 text-xs px-2 rounded-xl" v-if="feedbackInputCoperti" :class="{ glow : highLight }">{{feedbackInputCoperti}}</p>
-
-      <button class=" bg-red-300 hover:bg-red-700 hover:text-white text-black rounded my-5 max-w-fit p-2" @click="sendDataset"> Aggiungi</button>
+      <!-- feedback output -->
+      <p class="text-red-600 my-3 text-xs px-2 rounded-xl"
+      :class="{ glow : errorGlow }"
+      v-if="alertToggle"
+      >{{error}}</p>
+     
+      <!-- send data button-->
+      <button 
+      class=" bg-red-300 hover:bg-red-700 hover:text-white text-black rounded my-5 max-w-fit p-2"
+      @click="saveReservation">Save</button>
 
     </div>
   </div>
 </template>
   
 <script>
+import { Reservation } from '@/modules/Reservations';
 import VueDatePicker from '@vuepic/vue-datepicker';
 import '@vuepic/vue-datepicker/dist/main.css';
+import { ref, toRaw } from 'vue';
+
+import { defineComponent } from 'vue';
 
 export default {
-  
-  props:[
-    "currentEntryToEdit"
-  ],
-  
-  data () {
-    return {
-        nome: "",
-        giorno: "",
-        ora: "",
-        coperti: "",
-        uuid: "",
-
-        feedbackInputGiorno: "",
-        feedbackInputOra: "",
-        feedbackInputCoperti: "",
-
-        highLight: false,
-        date: "",
-        time: "",
-
-        format: "",
-        startTime: { hours: 12, minutes: 0 },
+  props: {
+    reservationToEdit: {
+      type: Object,
+      required: false
     }
   },
-  mounted() {
 
-    //check prop
-    console.log("MOUNTED", JSON.parse(JSON.stringify(this.currentEntryToEdit)).currentEntryToEdit)
-      if (this.currentEntryToEdit !== ""){
-        let parsedEntry = JSON.parse(JSON.stringify(this.currentEntryToEdit)).currentEntryToEdit
-        this.nome = parsedEntry.nome
-        this.giorno = parsedEntry.giorno
-        this.ora = parsedEntry.ora
-        this.coperti = parsedEntry.coperti
-        this.uuid = parsedEntry.uuid
+  setup(props, { emit }){
+
+    let newName = ref(props.reservationToEdit?.name || null) 
+    let newDate = ref()
+    let newHour = ref()
+    let newSeats = ref(props.reservationToEdit?.seats || null)
+
+    function saveReservation(){
+      try{
+        let reservation = new Reservation(newName.value, newDate.value, toRaw(newHour.value), newSeats.value)
+        Reservation.pushToDB(reservation)
+        escForm()
       }
-      else{}
-    },
-
-    //init calendar
-    
-
-  methods: {
-    generaUUID(){
-      if(this.uuid == ""){
-        const uuid = crypto.randomUUID();
-        console.log(uuid);
-        //check in the data for the same uuid, if so, pick another
-
-        this.uuid = uuid
+      catch(errorObj){
+        manageError(errorObj.message)
       }
-      else{}
-    },
+    }
 
-    escForm(){
-      this.nome = ""
-      this.ora = ""
-      this.giorno = ""
-      this.uuid = ""
-      this.coperti = ""
-      this.$emit("close")
-    },
+    //error alerts logic
+    let alertToggle = ref(false)
+    let error = ref()
+    let errorGlow = ref(false)
+    function manageError(errorLog){
+      //show error alert
+      alertToggle.value = true
+      error.value = errorLog
+      //glow alert for 2 seconds
+      errorGlow.value = true
+      setTimeout(() => {errorGlow.value = false}, 2000)
+    }
 
+    //edit a reservation logic
 
-    sendDataset(){
-      this.highLight_Activation()
+    //close form
+    function escForm(){
+      emit("close")
+    }
 
-      this.feedbackInputData = ""
-      this.feedbackInputCoperti = ""
-
-      //assegno una variabile al risultato dei controlli sennò si crea un bug nella
-      //visualizzazione degli alert di errore in quanto nell'if i controlli vengono throwati non uniformemente
-      const dataOk = this.checkOra()
-      const giornoOk = this.checkGiorno()
-      const copertiOk = this.checkCoperti()
-
-
-
-      if(dataOk && giornoOk && copertiOk){
-        console.log(this.nome, this.giorno, this.ora, this.coperti)
-
-        //unique ID
-        this.generaUUID()
-
-        //nome fittizio in caso di campo vuoto
-        if(this.nome == ""){
-          this.nome = "<Nessun Nome>"
-        }
-
-        this.$emit("close", this.nome, this.giorno, this.ora, this.coperti, this.uuid)
-
-        this.nome = ""
-        this.giorno = ""
-        this.ora = ""
-        this.coperti = ""
-        this.uuid = ""
-        }
-      else{}  
-    },
-
-
-    checkOra(){
-      /* if(isNaN(this.ora) || parseInt(this.ora) < 1 || parseInt(this.ora) > 24){
-        this.feedbackInputData = "inserisci un orario valido (numero da 1 a 24)"
-        return false
-      }
-      else{
-        return true
-      } */
-      if(this.ora == "" || this.ora == null || this.ora == " "){
-        this.feedbackInputOra = "inserisci un orario valido"
-        return false
-      }
-      else{
-        this.feedbackInputOra = ""
-        return true
-      }
-    },
-    checkGiorno(){
-      if(this.giorno == "" || this.giorno == null || this.giorno == " "){
-        this.feedbackInputGiorno = "inserisci un giorno valido"
-        return false
-      }
-      else{
-        this.feedbackInputGiorno = ""
-        return true
-      }
-    },
-    checkCoperti(){
-      if(isNaN(this.coperti) || parseInt(this.coperti) < 0 || parseInt(this.coperti) > 99){
-        this.feedbackInputCoperti = "inserisci un numero di coperti da 0 a 99"
-        return false
-      }
-      else{
-        this.feedbackInputCoperti = ""
-        return true
-      }
-    },
-
-
-    parsingDateformat(){
-      console.log("la data grezza è: ", this.date)
-      //parsing di Date Sat Apr 06 2024 01:14:00 GMT+0200 (Ora legale dell’Europa centrale)
-        //non necessario. calendario fornisce this.format come output della data (senza l'ora)
-      this.format = (date) => {
-        const day = date.getDate();
-        const month = date.getMonth() + 1;
-        const year = date.getFullYear();
-
-        this.giorno = day + " " + month + " " + year;
-
-
-        return `${day}/${month}/${year}`;
-      }
-    },
-    parsingHourformat(){
-      console.log("l' ora grezza è: ", this.time)
-      //parsing di this.time
-
-      const timeObj = JSON.parse(JSON.stringify(this.time))
-      console.log("l' ora parsata è: ",timeObj)
-
-      this.ora = timeObj.hours + ":" + timeObj.minutes
-
-    },
-
-    highLight_Activation(){
-      this.highLight = true
-      setTimeout(() => {this.highLight = false}, 2000)
+    return{
+      newName, newDate, newHour, newSeats,
+      escForm, saveReservation,
+      alertToggle, error, errorGlow
     }
   }
-  
 }
 </script>
   
@@ -241,13 +137,13 @@ export default {
 
     height: 40px;
   }
+
   .glow {
     animation: glowing 2s infinite;
   }
-
   @keyframes glowing {
-    0% {background-color: white;}
-    50% {background-color: rgba(255, 0, 0, 0.5);}
-    100% {background-color: white;}
+    0% {filter: drop-shadow(0 0px 0px rgb(255 0 0 / 0));}
+    50% {filter: drop-shadow(0 1px 2px rgb(255 0 0 / 1));}
+    100% {filter: drop-shadow(0 0px 0px rgb(255 0 0 / 0));}
   }
 </style>

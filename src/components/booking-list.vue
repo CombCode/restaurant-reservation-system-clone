@@ -1,247 +1,254 @@
 <template>
     <div>
         <!-- day chooser bar -->
-        <div class="my-5 flex flex-row justify-center max-[600px]:flex-col">
-            
-            <div v-if="!showAll" class="flex flex-row flex-grow justify-center">
-                <p @click="changeDay('down')" class="font-mono font-bold text-2xl rounded px-2 cursor-pointer hover:bg-red-900 hover:text-white" ><</p>
-                <p class="text-xl font-mono font-bold">{{requestedWeekDay}} {{requestedDay}}</p>   
-                <p @click="changeDay('up')" class="font-mono font-bold text-2xl rounded px-2 cursor-pointer hover:bg-red-900 hover:text-white">></p>
+        <div class=" flex justify-center flex-col items-center
+        md:flex-row md:my-5">  
+            <!-- day chooser label -->
+            <div class="flex flex-row justify-center items-center py-6 w-3/4
+            md:border-r-2 md:border-solid md:border-red-900">
+                <p @click="prevDate()" 
+                class="border-2 border-red-200 rounded font-mono font-bold text-2xl  rounded-l-xl px-2 cursor-pointer hover:bg-red-900 hover:text-white
+                md:border-0" ><</p>
+                <p 
+                class="text-xl font-mono font-bold w-40 mx-6
+                md:mx-0">{{selectedDateLabel}}</p>   
+                <p @click="nextDate()" 
+                class="border-2 border-red-200 font-mono font-bold text-2xl rounded-r-xl px-2 cursor-pointer hover:bg-red-900 hover:text-white
+                md:border-0">></p>
             </div>
-
-            <div class="flex flex-row justify-right mx-10">
-                <input type="checkbox" id="showAll" class="py-auto" v-model="showAll">
-                <label for="showAll" class="pt-1">Show All</label>
+            <!-- sorting buttons -->
+            <div class="w-full rounded-e-xl flex flex-row justify-evenly
+            md:flex-col md:w-1/4 md:ml-2 md:mr-4">
+                <button
+                class=" bg-red-100 hover:bg-red-900 hover:text-white text-black text-sm my-1 p-4 rounded
+                md:rounded-e-xl md:p-0"
+                @click="sortByTime"
+                >Sort by hour</button>
+                <button
+                class=" bg-red-100 hover:bg-red-900 hover:text-white text-black text-sm my-1 p-4 rounded
+                md:rounded-e-xl md:p-0"
+                @click="sortBySeats"
+                >Sort by seats</button>
+                <!-- show all button -->
+                <button
+                class="text-sm my-1 p-4 rounded
+                md:rounded-e-xl md:p-0"
+                :class="{'bg-red-900 text-white ': showAll, 'bg-red-100 text-black': !showAll}"
+                @click="toggleShowAll"
+                >Show all</button>
             </div>
-
         </div>
 
-        <!-- header legenda -->
-        <div class="grid border-b-2 border-solid border-grey-200 mb-4 max-[600px]:invisible" :class="{ 'grid-cols-5' : showAll, 'grid-cols-4' : !showAll}">
-            <p class="text-red-900">azioni</p>
-            <p class="text-red-900">nome</p>
-            <div v-if="showAll" class="flex flex-row justify-center">
-                <p @click="changeGiornoLook" class="text-red-900 font-bold rounded px-2 cursor-pointer hover:bg-red-900 hover:text-white" ><</p>
-                <p class="text-red-900 mx-1">{{giornoLook}}</p>
-                <p @click="changeGiornoLook" class="text-red-900 font-bold rounded px-2 cursor-pointer hover:bg-red-900 hover:text-white">></p>
-            </div>
-            <p class="text-red-900">ora</p>
-            <p class="text-red-900">coperti</p>
+        <!-- legenda -->
+        <div class="grid border-b-2 border-solid border-grey-200 mb-4 invisible grid-cols-4
+        md:visible">
+            <p class="text-red-900">actions</p>
+            <p class="text-red-900">name</p>
+            <p class="text-red-900">hour</p>
+            <p class="text-red-900">seats</p>
         </div>
 
+        <!-- selected day reservations -->
+        <div>
+            <ul v-for="reservation of selectedDate_Reservations" :key="reservation.uid">
+                <div 
+                class="grid py-2 h-auto grid-cols-2 grid-rows-3 border-t border-red-900 mx-5
+                hover:bg-gray-200 items-center 
+                md:grid-cols-4 md:grid-rows-1 md:border-t-0 md:mx-0"
+                :class="{'bg-green-200': reservation.tag == 'arrived', 'bg-orange-200': reservation.tag == 'noShow'}">
+                    <actionsOnEntry @actionOnReservation="(action) => handleActionOnReservation(action, reservation)"
+                    class="col-span-1 row-span-3"></actionsOnEntry>
+                    <li class="grid grid-cols-2 grid-rows-1 md:grid-cols-1">
+                        <p class="text-sm text-gray-500 md:invisible">name:</p>
+                        <p>{{reservation.name}}</p>
+                    </li>
+                    <li class="grid grid-cols-2 grid-rows-1 md:grid-cols-1">
+                        <p class="text-sm text-gray-500 md:invisible">hour:</p>
+                        <p>{{reservation.hour}}</p>
+                    </li>
+                    <li class="grid grid-cols-2 grid-rows-1 md:grid-cols-1">
+                        <p class="text-sm text-gray-500 md:invisible">seats:</p>
+                        <p>{{reservation.seats}}</p>
+                    </li>
+                </div>
 
-        <!-- lista -->
-            <!-- vista con tutte le prenotazioni -->
-        <div v-if="showAll">
-            <ul v-for="(entry, index) in reservationData" :key="entry.uuid" class="grid grid-cols-5 py-2 h-auto hover:bg-gray-200 items-center max-[600px]:grid-cols-1 max-[600px]:border max-[600px]:border-red-900">
-                <actionsOnEntry @azioneRichiesta="handle_azioneRichiesta($event,entry.uuid)"></actionsOnEntry>
-                <li>{{entry.nome}}</li>
-                <li v-if="giornoLook == 'data'">{{entry.giorno}}</li>
-                <li v-if="giornoLook == 'giorno'">{{giorniDellaSettimanaArray[index]}}</li>
-                <li>{{entry.ora}}</li>
-                <li>{{entry.coperti}}</li>
             </ul>
         </div>
-            <!-- vista con solo le prenot del giorno -->
-        <div v-if="!showAll">
-            <ul v-for="entry of reservationData_SelectedDay" :key="entry.uuid" class="grid grid-cols-4 py-2 h-auto hover:bg-gray-200 items-center max-[600px]:grid-cols-1 max-[600px]:border max-[600px]:border-red-900">
-                <actionsOnEntry @azioneRichiesta="handle_azioneRichiesta($event,entry.uuid)"></actionsOnEntry>
-                <li>{{entry.nome}}</li>
-               <!--  <li>{{entry.giorno}}</li> -->
-                <li>{{entry.ora}}</li>
-                <li>{{entry.coperti}}</li>
-            </ul>
-        </div>
-        
     </div>
 </template>
 
 <script>
 import actionsOnEntry from './actionsOnEntry.vue';
-import { isProxy, toRaw } from 'vue';
+import { ref, toRaw } from 'vue';
+import { Reservation } from '@/modules/Reservations';
+import { ComputedReservation } from '@/modules/ComputedReserations';
 
-    export default {
-        components: {
-            actionsOnEntry
-        },
-        props: [
-            "reservationData"
-        ],
-        data(){
-            return{ 
+export default {
+    components: {
+        actionsOnEntry
+    },
 
-                giornoLook: "data",
-                giorniDellaSettimanaArray: [],
+    setup(props, { emit }){
 
-                requestedWeekDay: "",
-                requestedDay: "",
+        //date to show logic
+        let selectedDate = ref(new Date()) //init at today
+        let selectedDateLabel = ref("")
+        updateLabel()
 
-                showAll: false,
+        //request reservations //TODO make this an async function
+        let selectedDate_Reservations = ref()   //list view reload when this var change
+        getSelectedDateReservations()
 
-                reservationData_SelectedDay: [],
+        function nextDate(){
+            //make the selected day the next
+            selectedDate.value.setDate(selectedDate.value.getDate() + 1)
+            updateLabel()
+            getSelectedDateReservations()
+        }
+        function prevDate(){
+            //make the selected day the previous
+            selectedDate.value.setDate(selectedDate.value.getDate() - 1)
+            updateLabel()
+            getSelectedDateReservations()
+        }
+        
+        //select date lable handling
+        function updateLabel(){
+            selectedDateLabel.value = weekDayConverter(selectedDate.value.getDay()) + " " + selectedDate.value.getDate() + "/" + selectedDate.value.getMonth()
+        }
+        function weekDayConverter(n){
+            switch(n){
+                case 0: return "Sunday"   
+                case 1: return "Monday"
+                case 2: return "Tuesday"
+                case 3: return "Wednesday"
+                case 4: return "Thursday"
+                case 5: return "Friday"
+                case 6: return "Saturday"
             }
-        },
-        mounted() {
-            const d = new Date()
-            const weekDay = d.getDay()  //day of te week from 0 to 6
-            
-            let weekDayW = this.findDayOfWeek(weekDay)
+        }
 
-            const day = d.getDate()
-            const month = d.getMonth() + 1 // .getUTCMonth non usa la timezone locale ma la +00
-            const year = d.getFullYear()
-
-            this.requestedWeekDay = weekDayW
-            console.log("giorno della settimana on mount num: ", weekDay)
-            console.log("giorno della settimana on mount parola: ", weekDayW)
-            this.requestedDay = day + "/" + month + "/" + year
-
-            this.popolate_reservationData_SelectedDay() //potrei usare anche una listen su this.request day
-
-            this.propChanged = !this.propChanged
-
-            this.popolate_giorniDellaSettimanaArray()
-        },
-
-        /* watch: {
-            reservationData(newValue, oldValue) {
-                console.log("rimontando la lista")
-                //this.$forceUpdate()
-                
+        //reservation list handling
+        function getSelectedDateReservations(){
+            selectedDate_Reservations.value = Reservation.getSpecificDateReservations(selectedDate.value) //objects array
+        }
+        
+        //sorting logic
+        function sortByTime(){
+            selectedDate_Reservations.value.sort((a, b) => {
+                const aHH = parseInt(a.hour.slice(0, 2))
+                const bHH = parseInt(b.hour.slice(0, 2))
+                const aMM = parseInt(a.hour.slice(3, 5))
+                const bMM = parseInt(b.hour.slice(3, 5))
+                if(aHH - bHH == 0){
+                    return aMM - bMM
+                }
+                else{
+                    return aHH - bHH
+                }
+            })
+        }
+        let toggleSortingSeatsDirection = 0
+        function sortBySeats(){
+            //switching sorting big->small to small->big and so on  
+            if(toggleSortingSeatsDirection %2 == 0){
+                selectedDate_Reservations.value.sort((a, b) => {return a.seats - b.seats})
             }
+            else{
+                selectedDate_Reservations.value.sort((a, b) => {return b.seats - a.seats})
+            }
+            toggleSortingSeatsDirection++
+        }
+
+        //Actions on reservations handling
+        function handleActionOnReservation(action, reservation){
+            switch(action){
+                case "arrived" : {
+                    //new computedReservation object
+                    let computedReservation
+                    try{
+                        computedReservation = new ComputedReservation(reservation.name, selectedDate.value, reservation.hour, reservation.seats, "arrived")
+                    }
+                    catch(error){
+                        console.log("error")
+                        //TODO
+                    }
+                    //save the new object on computed DB
+                    ComputedReservation.pushToDB(computedReservation)
+                    //delete from general DB
+                    Reservation.deleteFromDB(reservation)
+                    break
+                }
+                case "noShow" : {
+                    //new computedReservation object
+                    let computedReservation 
+                    try{
+                        computedReservation = new ComputedReservation(reservation.name, selectedDate.value, reservation.hour, reservation.seats, "noShow")    
+                    }
+                    catch(error){
+                        console.log("error")
+                        //TODO
+                    }
+                    //save the new object on computed DB
+                    ComputedReservation.pushToDB(computedReservation)
+                    //delete from general DB
+                    Reservation.deleteFromDB(reservation)
+                    break
+                }
+                case "edit" : {
+                    //delegate to App.js and than to newEntry-PopUp the creation of
+                    //a new sobstitute reservation 
+                    emit("editReservation", reservation)
+                    //delete from general DB the wrong one
+                    Reservation.deleteFromDB(reservation)
+                    break
+                }
+                case "delete" : {
+                    Reservation.deleteFromDB(reservation)
+                    break
+                }
+            }
+            //trigger the reload of list view
+            getSelectedDateReservations()
+        }
+
+        //show All function handling
+        let showAll = ref(false)
+        function toggleShowAll(){
+
+            showAll.value = !showAll.value
+
+            //computed reservation objs array
+            let computed_reservations = ComputedReservation.getSpecificDateReservations(selectedDate.value) //objects array
+
+            if(showAll.value){ 
+                //adding the computed reservations to the view selected date reservations array
+                selectedDate_Reservations.value = selectedDate_Reservations.value.concat(computed_reservations)
+            }
+            else{
+                //subtract the computed reservations to the view selected date reservations array
+                selectedDate_Reservations.value = selectedDate_Reservations.value.filter(res => !computed_reservations.includes(toRaw(res)))
+            }
+        }
+
+
+        //--------------------------------------------------------------
+        return{
+            showAll, toggleShowAll,
+            selectedDateLabel,
+            selectedDate, selectedDate_Reservations, prevDate, nextDate,
+            sortByTime, sortBySeats,
+            handleActionOnReservation  
+        }
+    },
+
+        /* handle_azioneRichiesta(code, uuid){
+            console.log("code: ", code)
+            console.log("uuid: ", uuid)
+            this.$emit("eseguiAzioneSuEntry", code, uuid)
         }, */
 
-
-        methods:{
-            handle_azioneRichiesta(code, uuid){
-                console.log("code: ", code)
-
-                /* const parentUl = event.target.closest('ul');   //bastava usare "event"... assurdo
-                console.log(parentUl);
-                
-                const parentEntryUuid = parentUl.dataset.entryUuid;
-                console.log("parentEntryUuid: ", parentEntryUuid) */
-                console.log("uuid: ", uuid)
-                
-                this.$emit("eseguiAzioneSuEntry", code, uuid)
-            },
-
-            changeGiornoLook(){
-                if(this.giornoLook == "giorno"){
-                    this.giornoLook = "data"
-                }
-                else if(this.giornoLook == "data"){
-                    this.giornoLook = "giorno"
-                    this.popolate_giorniDellaSettimanaArray()
-                }
-            },
-
-            popolate_giorniDellaSettimanaArray(){
-                this.giorniDellaSettimanaArray = []
-
-                this.reservationData.forEach((element) => {
-                    console.log("popolamento giorni della settimana")
-                    console.log(toRaw(element.giorno))
-                    let date = toRaw(element.giorno)
-                    let dateObj = new Date((date.match(/\d+/g)[2]), (date.match(/\d+/g)[1]-1), (date.match(/\d+/g)[0]))    //(year, monthIndex, day)
-                    console.log(dateObj)
-                    let dayOfTheWeek = this.findDayOfWeek(dateObj.getDay())
-                    console.log("dayOfTheWeek", dayOfTheWeek)
-                    console.log("giorniDellaSettimanaArray", this.giorniDellaSettimanaArray)
-                    this.giorniDellaSettimanaArray.push(dayOfTheWeek)
-                });
-            },
-            findDayOfWeek(weekDay){
-                if(weekDay == 0)
-                    return "domenica"
-                else if(weekDay == 1)
-                    return "lunedi"
-                else if(weekDay == 2)
-                    return "martedi"
-                else if(weekDay == 3)
-                    return "mercoledi"
-                else if(weekDay == 4)
-                    return "giovedi"
-                else if(weekDay == 5)
-                    return "venerdi"
-                else if(weekDay == 6)
-                    return "sabato"
-            },
-
-            changeDay(strReq){
-                
-                //pulisco la lista attuale
-                this.reservationData_SelectedDay = []
-
-                //identifico giorno selezionato attualmente
-                let dayNum = parseInt(this.requestedDay.match(/\d+/g)[0])
-                let monthNum = parseInt(this.requestedDay.match(/\d+/g)[1])
-                let yearNum = parseInt(this.requestedDay.match(/\d+/g)[2])
-                console.log("giorno regen: ", dayNum)
-                console.log("mese regen: ", monthNum)
-                console.log("anno regen: ", yearNum)
-
-                let currentDaySelected = new Date(yearNum, monthNum-1, dayNum) //-1 per l'indicizzazione dei mesi
-                console.log("data completa oggetto post regen: ", currentDaySelected)
-
-
-                if(strReq == "up"){
-                    console.log("up")
-
-                    //giorno successivo
-                    let dayAfter = new Date(yearNum, monthNum-1, dayNum);
-                    dayAfter.setDate(currentDaySelected.getDate()+1);
-                    console.log("dayAfter: ", dayAfter)
-
-                    //cambio variabili per giorno successivo
-                    let m = (dayAfter.getMonth() + 1) % 12 || 12;
-                    this.requestedDay = dayAfter.getDate() + "/" + m + "/" + dayAfter.getFullYear()
-
-                    //cambio nome giorno settimana
-                    this.requestedWeekDay = this.findDayOfWeek(dayAfter.getDay())
-
-                    this.popolate_reservationData_SelectedDay()
-
-                }
-                else if(strReq == "down"){
-                    console.log("down")
-
-                    //giorno precedente
-                    let dayBefore = new Date(yearNum, monthNum-1, dayNum);
-                    dayBefore.setDate(currentDaySelected.getDate()-1);
-                    console.log("dayBefore: ", dayBefore)
-
-                    //cambio variabili per giorno successivo
-                    let m = dayBefore.getMonth()+1
-                    this.requestedDay = dayBefore.getDate() + "/" + m + "/" + dayBefore.getFullYear()
-
-                    //cambio nome giorno settimana
-                    this.requestedWeekDay = this.findDayOfWeek(dayBefore.getDay())
-
-                    this.popolate_reservationData_SelectedDay()
-                }     
-            },
-
-            popolate_reservationData_SelectedDay(){ //sarebbe meglio farla asincrona poi e non caricare tutte le prenotazioni in mounted
-                console.log("popolamento dati del giorno selezionato")
-                for(let i=0; i < this.reservationData.length; i++){
-                   console.log("array reservation data.giorno: ",this.reservationData[i].giorno )
-                   console.log("array reservation data.giorno match day: ",this.reservationData[i].giorno.match(/\d+/g)[0])
-
-                   //se giorno della prenot. in this.reservationData == selectedDay allora push in reservationData_SelectedDay
-                    if(this.reservationData[i].giorno.match(/\d+/g)[0] == this.requestedDay.match(/\d+/g)[0]
-                        && this.reservationData[i].giorno.match(/\d+/g)[1] == this.requestedDay.match(/\d+/g)[1]
-                        && this.reservationData[i].giorno.match(/\d+/g)[2] == this.requestedDay.match(/\d+/g)[2]
-                        ){
-                            this.reservationData_SelectedDay.push(this.reservationData[i])
-                        }
-                    else{}
-                    
-                }
-            },
-            
-        },
-    }
+}
 </script>
 
 <style>
